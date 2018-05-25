@@ -1,0 +1,38 @@
+---
+title: "Simulation framework"
+author: "Jens Åström"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::pdf_document:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  tidy = T
+)
+```
+
+Insect surve scheme - Power analysis
+============
+For the general insect survey power analysis, the basic idea is to 
+1.  first create a general framework that simulates insect communities throughout the country,
+2.  use this method to generate many simulated insect communities under different scenarios
+3.  sample this community, mimicking various survey schemes
+4.  calculate statistics on the power and general accuracy of the survey scheme.
+
+The best case scenario would be to simulate the communities in a way that is as similar as possible to a future model of the findings in the samples. Then we could feed the parameter estimates from these models back to the simulation routine to update the power analysis. 
+
+
+**I'm currently contemplating two different approaches to simulate the occurrences.**
+
+1.  Simulate measurement values for each SSB 500 grid, based on predictor variables for each grid cell. These might include polynomials on lat and lon, to control for spatial autocorrelation not covered by the explanatory data. 
+2.  For each species, simulate a species distribution, which collectively adds up to local communities. This is a desired end product, but might be more difficult. It includes more or less coherent distributions for each species. However, the simulation algorithm is probably far from the later used distribution models.
+
+
