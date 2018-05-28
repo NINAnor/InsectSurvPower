@@ -1,14 +1,17 @@
 Package: InsectSurvPower
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Functions for calculating power of survey design.
 Version: 0.1.0
-Author: Who wrote it
+Author: person("Jens", "Åström", email = "jens.astrom@nina.no",
+  role = c("aut", "cre"))
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Description: This is a package for internal use in NINA. 
+  It contains functions and scripts to calculate power of survey design through simulations.
+  It is mainly intended to be used in the development of an insect survey scheme in Norway.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
+RoxygenNote: 6.0.1
