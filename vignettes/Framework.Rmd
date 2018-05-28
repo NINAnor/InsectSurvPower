@@ -19,6 +19,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r}
+require(tidyverse)
+#require(InsectSurvPower)
+```
+
+
 Insect surve scheme - Power analysis
 ============
 For the general insect survey power analysis, the basic idea is to 
@@ -35,4 +41,44 @@ The best case scenario would be to simulate the communities in a way that is as 
 1.  Simulate measurement values for each SSB 500 grid, based on predictor variables for each grid cell. These might include polynomials on lat and lon, to control for spatial autocorrelation not covered by the explanatory data. 
 2.  For each species, simulate a species distribution, which collectively adds up to local communities. This is a desired end product, but might be more difficult. It includes more or less coherent distributions for each species. However, the simulation algorithm is probably far from the later used distribution models.
 
+Probably the 1st is the most workable.
+
+
+Sandbox on workflow
+===============
+
+Load map on 10km scale
+--------------
+
+```{r}
+postgresConnect()
+map10km <- getSSBGrid()
+```
+
+```{r}
+map10km
+plot(map10km["kommune"], key.pos = NULL)
+```
+
+Add variable column to the map
+-------------
+
+```{r}
+map10km$prob <- createOccProb(map10km, sigma = 0.01)
+
+plot(map10km["prob"])
+```
+
+
+Sample the map for species
+---------------
+
+```{r}
+mySample <- map10km %>% 
+  slice(sample(1:nrow(.), 100, replace =F))
+
+nSamples <- 10
+mySample <- mySample %>% transform(presences = rbinom(nrow(.), nSamples, .$prob))
+
+```
 

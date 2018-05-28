@@ -13,13 +13,14 @@
 #' plot(fylke10km["fylke"])
 #' }
 #' @import sf
+#' @import tidyverse
 
 getSSBGrid <- function(conn = con, scale = c("10km","5km", "1km", "500m")){
 
   scale <- match.arg(scale)
   ssb <- paste0("ssb_data_utm33n.ssb_", scale)
 
-  query <- paste0("SELECT s.ssbid, s.xcoor, s.ycoor, s.geom, f.\"FYLKESNUMMER\", f.navn fylke, k.\"KOMMUNENUMMER\", k.navn kommune
+  query <- paste0("SELECT s.ssbid, s.xcoor lon, s.ycoor lat, s.geom, f.\"FYLKESNUMMER\", f.navn fylke, k.\"KOMMUNENUMMER\", k.navn kommune
   FROM ", ssb," s,
   \"AdministrativeUnits\".\"Norway_County_Fylke_polygons\" f,
   \"AdministrativeUnits\".\"Norway_Municipality_Kommune_polygons\" k
@@ -28,6 +29,6 @@ getSSBGrid <- function(conn = con, scale = c("10km","5km", "1km", "500m")){
   --ORDER BY s.ssbid
   --LIMIT 10")
 
-  out <- st_read_db(conn = conn, query = query, geom_column = "geom")
+  out <- st_read_db(conn = conn, query = query, geom_column = "geom") %>% as_tibble() %>% st_as_sf
   return(out)
 }
