@@ -13,7 +13,7 @@
 #' plot(fylke10km["fylke"])
 #' }
 #' @import sf
-#' @import tidyverse
+#' @import dplyr
 
 getSSBGrid <- function(conn = con, scale = c("10km","5km", "1km", "500m")){
 
@@ -29,6 +29,9 @@ getSSBGrid <- function(conn = con, scale = c("10km","5km", "1km", "500m")){
   --ORDER BY s.ssbid
   --LIMIT 10")
 
-  out <- st_read_db(conn = conn, query = query, geom_column = "geom") %>% as_tibble() %>% st_as_sf
+  out <- st_read_db(conn = conn, query = query, geom_column = "geom") %>%
+    dplyr::as_tibble() %>%
+    sf::st_as_sf()
+
   return(out)
 }

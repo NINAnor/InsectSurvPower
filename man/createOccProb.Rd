@@ -4,12 +4,18 @@
 \alias{createOccProb}
 \title{createOccProb}
 \usage{
-createOccProb(map, intercept = 0.1, formula = ~lat + lon,
-  fylkeParams = c(0.1, 0.4), kommuneParams = c(0.1, 0.4), sigma = 0,
-  scale = T)
+createOccProb(map, intercept = 0.5, formula = ~NULL, sigmaFylke = 0.1,
+  sigmaKommune = 0.1, sigmaGrid = 0, sortFylke = T, sortKommune = T,
+  sortGrid = T)
 }
 \arguments{
-\item{formula}{}
+\item{formula}{Not yet implemented}
+
+\item{sigmaFylke}{Standard deviance of fylkes}
+
+\item{sigmaFylke}{Standard deviance of kommunes.}
+
+\item{sigmaFylke}{Standard deviance of grids.}
 }
 \description{
 Creates a probability of species occurrence based on explanatory factors.

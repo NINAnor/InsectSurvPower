@@ -64,10 +64,17 @@ Add variable column to the map
 -------------
 
 ```{r}
-map10km$prob <- createOccProb(map10km, sigma = 0.01)
+map10km$prob <- createOccProb(map10km, sigmaFylke = 0.1, sigmaKommune = 0.1, sigmaGrid = 0.01, sortGrid = F, sortFylke = F)
 
 plot(map10km["prob"])
 ```
+
+```{r}
+tt <- sortMap(map10km, sortingColumn = "prob")
+plot(tt["prob"])
+
+```
+
 
 
 Sample the map for species
