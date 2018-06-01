@@ -5,8 +5,8 @@
 \title{createOccProb}
 \usage{
 createOccProb(map, intercept = 0.5, formula = ~NULL, sigmaFylke = 0.1,
-  sigmaKommune = 0.1, sigmaGrid = 0, sortFylke = T, sortKommune = T,
-  sortGrid = T)
+  sigmaKommune = 0.1, sigmaGrid = 0, nYears = 5, interceptTrend = -0.05,
+  sortFylke = T, sortKommune = T, sortGrid = T)
 }
 \arguments{
 \item{formula}{Not yet implemented}

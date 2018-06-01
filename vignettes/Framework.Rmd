@@ -64,16 +64,18 @@ Add variable column to the map
 -------------
 
 ```{r}
-map10km$prob <- createOccProb(map10km, sigmaFylke = 0.1, sigmaKommune = 0.1, sigmaGrid = 0.01, sortGrid = F, sortFylke = F)
+map10km$prob <- createOccProb(map10km, 
+                              intercept = 0.5,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05, 
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
 
 plot(map10km["prob"])
 ```
 
-```{r}
-tt <- sortMap(map10km, sortingColumn = "prob")
-plot(tt["prob"])
-
-```
 
 
 
@@ -81,11 +83,91 @@ Sample the map for species
 ---------------
 
 ```{r}
-mySample <- map10km %>% 
-  slice(sample(1:nrow(.), 100, replace =F))
+testSample <- sampleBin(map10km, column = "prob", nSites = 400, nObs = 1)
+plot(testSample["nFound"])
+```
 
-nSamples <- 10
-mySample <- mySample %>% transform(presences = rbinom(nrow(.), nSamples, .$prob))
+
+
+```{r}
+sampHordaland <- sampleBin(map10km, column = "prob", nSites = 100, nObs = 1, subFylke = "Hordaland")
+
+plot(sampHordaland["nFound"])
 
 ```
 
+
+Model the findings
+----------------
+
+
+```{r}
+require(lme4)
+mod1 <- glmer(nFound ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = testSample)
+
+summary(mod1)
+
+```
+The estimates are reasonable but not exactly perfect. We can see how the improve when we add the number of observations per grid cell.
+
+
+```{r}
+obs10Sample <- sampleBin(map10km, column = "prob", nSites = 400, nObs = 10)
+plot(obs10Sample["nFound"])
+```
+
+```{r}
+require(lme4)
+mod2 <- glmer(cbind(nFound, nVisits - nFound) ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = obs10Sample)
+
+summary(mod2)
+
+```
+
+Let's see what happens if we drastically increase the number of grid cells sampled
+
+
+```{r}
+bigSample <- sampleBin(map10km, column = "prob", nSites = 4000, nObs = 10)
+plot(bigSample["nFound"])
+```
+
+```{r}
+mod3 <- glmer(cbind(nFound, nVisits - nFound) ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = bigSample)
+
+summary(mod3)
+
+```
+
+Not much different estistimates than from between a sample of 400 and 4000 grid cells. 
+
+
+Time trends
+---------
+
+```{r}
+years5 <- createOccProb(map10km, 
+                              intercept = 0.5,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05, 
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              nYears = 5,
+                              interceptTrend = -0.05)
+
+```
+```{r}
+sample5years <- sampleBin(years5, column = "prob", nSites = 400, nObs = 10)
+```
+
+```{r}
+require(lme4)
+mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (1|fylke) + (1|kommune), family = "binomial", data = sample5years)
+
+summary(mod4)
+
+```
+
+Looks pretty good. Time trend rather well estimated. This corresponds to a cumulative decrease of about 22% over 5 years.

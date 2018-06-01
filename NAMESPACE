@@ -3,6 +3,7 @@
 export(createOccProb)
 export(getSSBGrid)
 export(postgresConnect)
+export(sampleBin)
 import(DBI)
 import(RPostgres)
 import(dplyr)

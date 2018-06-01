@@ -26,6 +26,8 @@ createOccProb <- function(map,
                           sigmaFylke = 0.1,
                           sigmaKommune = 0.1,
                           sigmaGrid = 0,
+                          nYears = 5,
+                          interceptTrend = -0.05,
                           sortFylke = T,
                           sortKommune = T,
                           sortGrid = T) {
@@ -68,10 +70,23 @@ createOccProb <- function(map,
   map <- map %>%
     transform(gridEff = .gridVals)
 
-  ##NEED TO LIMIT THE TOTAL EFFECT TO BTW 0 AND 1
-  #sum the effects
-  map <- map %>%
-    transform(out = intercept + fylkeEff + kommuneEff + gridEff)
+  #sum the effects, using invlogit link
+  out <- map %>%
+    transform(year = 1,
+              prob = exp(intercept + fylkeEff + kommuneEff + gridEff)/(1+exp(intercept + fylkeEff + kommuneEff + gridEff))) %>%
+    sf::st_as_sf()
 
-  return(map$out)
+  if(nYears > 1){
+    increment <- list()
+    for(i in 2:nYears){
+      increment[[(i-1)]] <- map %>%
+        transform(year = i,
+                  prob = exp(intercept * exp(interceptTrend * i) + fylkeEff + kommuneEff + gridEff)/(1+exp(intercept * exp(interceptTrend * i) + fylkeEff + kommuneEff + gridEff)))
+    }
+
+
+  out <- suppressWarnings(bind_rows(out, increment)) %>%
+    dplyr::as_tibble()
+  }
+  return(out)
 }
