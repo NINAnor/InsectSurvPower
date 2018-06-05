@@ -26,6 +26,34 @@ createOccProb <- function(map,
                           sigmaFylke = 0.1,
                           sigmaKommune = 0.1,
                           sigmaGrid = 0,
+                          sigmaFylkeTrend = 0,
+                          sigmaKommuneTrend = 0,
+                          artypeEff = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 0,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0
+                          ),
+                          artypeTrend = c("Bebygd" = 0,
+                                          "Samferdsel" = 0,
+                                          "Fulldyrka jord" = 0,
+                                          "Overflatedyrka jord" = 0,
+                                          "Innmarksbeite" = 0,
+                                          "Skog" = 0,
+                                          "Åpen fastmark" = 0,
+                                          "Myr" = 0,
+                                          "Isbre" = 0,
+                                          "Ferskvann" = 0,
+                                          "Hav" = 0,
+                                          "Ikke kartlagt" = 0
+                          ),
                           nYears = 5,
                           interceptTrend = -0.05,
                           sortFylke = T,
@@ -43,22 +71,28 @@ createOccProb <- function(map,
   #fylkeEff
   .fylkeEff <- dplyr::tibble(FYLKESNUMMER = unique(map$FYLKESNUMMER))
   .fylkeVals <- rnorm(nrow(.fylkeEff), 0, sigmaFylke)
+  .fylkeTrends <- rnorm(nrow(.fylkeEff), 0, sigmaFylkeTrend)
   if(sortFylke){
     .fylkeVals <- sort(.fylkeVals)
+    .fylkeTrends <- sort(.fylkeTrends)
   }
   .fylkeEff <- .fylkeEff %>%
-    transform(fylkeEff = .fylkeVals)
+    transform(fylkeEff = .fylkeVals,
+              fylkeTrend = .fylkeTrends)
   map <- map %>%
     left_join(.fylkeEff, by = c("FYLKESNUMMER" = "FYLKESNUMMER"))
 
   ##kommuneEff
   .kommuneEff <- dplyr::tibble(KOMMUNENUMMER = unique(map$KOMMUNENUMMER))
   .kommuneVals <- rnorm(nrow(.kommuneEff), 0, sigmaKommune)
+  .kommuneTrends <- rnorm(nrow(.kommuneEff), 0, sigmaKommuneTrend)
   if(sortKommune){
     .kommuneVals <- sort(.kommuneVals)
+    .kommuneTrends <- sort(.kommuneTrends)
   }
   .kommuneEff <- .kommuneEff %>%
-    transform(kommuneEff = .kommuneVals)
+    transform(kommuneEff = .kommuneVals,
+              kommuneTrend = .kommuneTrends)
   map <- map %>%
     dplyr::left_join(.kommuneEff, by = c("KOMMUNENUMMER" = "KOMMUNENUMMER"))
 
@@ -70,23 +104,31 @@ createOccProb <- function(map,
   map <- map %>%
     transform(gridEff = .gridVals)
 
+
+  ##artypeEff
+  #use left_join to attach the artype values to the map
+
   #sum the effects, using invlogit link
   out <- map %>%
     transform(year = 1,
-              prob = exp(intercept + fylkeEff + kommuneEff + gridEff)/(1+exp(intercept + fylkeEff + kommuneEff + gridEff))) %>%
-    sf::st_as_sf()
+              prob = exp(intercept + fylkeEff + kommuneEff + gridEff)/(1+exp(intercept + fylkeEff + kommuneEff + gridEff)))
 
   if(nYears > 1){
     increment <- list()
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                  prob = exp(intercept * exp(interceptTrend * i) + fylkeEff + kommuneEff + gridEff)/(1+exp(intercept * exp(interceptTrend * i) + fylkeEff + kommuneEff + gridEff)))
+                  prob = exp(intercept * exp(interceptTrend * i) + fylkeEff * exp(fylkeTrend * i) + kommuneEff * exp(kommuneTrend * i)+ gridEff)/
+                    (1 + exp(intercept * exp(interceptTrend * i) + fylkeEff * exp(fylkeTrend * i) + kommuneEff * exp(kommuneTrend * i)+ gridEff)))
     }
 
+    increments <- do.call(rbind, increment)
 
-  out <- suppressWarnings(bind_rows(out, increment)) %>%
-    dplyr::as_tibble()
+  combined <- rbind(out, increments) %>%
+    dplyr::as_tibble()  %>%
+    sf::st_as_sf()
+
+
   }
-  return(out)
+  return(combined)
 }

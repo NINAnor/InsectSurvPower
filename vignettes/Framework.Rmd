@@ -51,8 +51,9 @@ Load map on 10km scale
 --------------
 
 ```{r}
-postgresConnect()
-map10km <- getSSBGrid()
+#postgresConnect()
+#map10km <- getSSBGrid()
+data(map10km)
 ```
 
 ```{r}
@@ -64,16 +65,32 @@ Add variable column to the map
 -------------
 
 ```{r}
-map10km$prob <- createOccProb(map10km, 
+mapOcc5years <- createOccProb(map10km, 
                               intercept = 0.5,
                               sigmaFylke = 0.4, 
                               sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05, 
+                              sigmaGrid = 0.05,
+                              nYears = 5,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
                               sortGrid = F, 
                               sortFylke = F, 
                               sortKommune = F)
 
-plot(map10km["prob"])
+mapOcc5years %>% 
+  filter(year == 1) %>%
+  select(prob) %>% 
+  plot()
+
+
+```
+```{r}
+mapOcc5years %>% 
+  filter(year == 5) %>%
+  select(prob) %>% 
+  plot()
+
 ```
 
 
@@ -155,16 +172,18 @@ years5 <- createOccProb(map10km,
                               sortFylke = F, 
                               sortKommune = F,
                               nYears = 5,
-                              interceptTrend = -0.05)
+                              interceptTrend = -0.05,
+                        sigmaFylkeTrend = 0.02,
+                        sigmaKommuneTrend = 0)
 
 ```
 ```{r}
-sample5years <- sampleBin(years5, column = "prob", nSites = 400, nObs = 10)
+sample5years <- sampleBin(years5, column = "prob", nSites = 4000, nObs = 10)
 ```
 
 ```{r}
 require(lme4)
-mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (1|fylke) + (1|kommune), family = "binomial", data = sample5years)
+mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (year|fylke) + (1|kommune), family = "binomial", data = sample5years)
 
 summary(mod4)
 
