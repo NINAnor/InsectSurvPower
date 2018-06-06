@@ -1,4 +1,4 @@
-#' createOccProb
+#' createOccNorm
 #'
 #' Creates a probability of species occurrence based on explanatory factors.
 #' The levels are calculated additively with a fylke effect, a kommune effect, plus a random part (sigma) that
@@ -20,7 +20,7 @@
 #' @import tidyverse
 
 
-createOccProb <- function(map,
+createOccNorm <- function(map,
                           intercept = 0.5,
                           formula = ~ NULL,
                           sigmaFylke = 0.1,
@@ -58,14 +58,8 @@ createOccProb <- function(map,
                           interceptTrend = -0.05,
                           sortFylke = T,
                           sortKommune = T,
-                          sortGrid = T) {
+                          sortGrid = T){
 
-  #range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-  #formula <- as.formula(formula)
-  # formulaEff <- map %>%
-  #   select(all.vars(formula)) %>%
-  #   as.matrix() %>%
-  #   range01() %*% fylkeParams
 
 
   #fylkeEff
@@ -108,10 +102,10 @@ createOccProb <- function(map,
   ##artypeEff
   #use left_join to attach the artype values to the map
   artypeEff <- tibble(ARTYPE = names(artypeEff),
-                         artypeEff = artypeEff)
+                      artypeEff = artypeEff)
 
   artypeTrend <- tibble(ARTYPE = names(artypeTrend),
-                      artypeTrend = artypeTrend)
+                        artypeTrend = artypeTrend)
 
   map <- map %>%
     left_join(artypeEff, by = c("ARTYPE" = "ARTYPE"))
@@ -119,26 +113,26 @@ createOccProb <- function(map,
   map <- map %>%
     left_join(artypeTrend, by = c("ARTYPE" = "ARTYPE"))
 
-  #sum the effects, using invlogit link
+  #sum the effects
   out <- map %>%
     transform(year = 1,
-              prob = exp(artypeEff + intercept + fylkeEff + kommuneEff + gridEff)/(1+exp(artypeEff + intercept + fylkeEff + kommuneEff + gridEff)))
+              norm = intercept + artypeEff + fylkeEff + kommuneEff + gridEff)
 
   if(nYears > 1){
     increment <- list()
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                   prob = exp(artypeEff + artypeTrend * i + intercept + interceptTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)/
-                     (1 + exp(artypeEff + artypeTrend * i + intercept + interceptTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)))
+                  norm = intercept + interceptTrend * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff
+)
 
-         }
+    }
 
     increments <- do.call(rbind, increment)
 
-  combined <- rbind(out, increments) %>%
-    dplyr::as_tibble()  %>%
-    sf::st_as_sf()
+    combined <- rbind(out, increments) %>%
+      dplyr::as_tibble()  %>%
+      sf::st_as_sf()
 
 
   }

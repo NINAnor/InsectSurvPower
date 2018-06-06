@@ -1,10 +1,10 @@
-#' sampleBin
+#' sampleNorm
 #'
 #'
 #' @param column Column to draw samples from.
 #' @param gridCells Vector of which map grid cells to draw from, for repeated samples from the same grid cells. Incompatible with n.
 #' @param nSites Integer, number of new random grids to sample. Imcompatible with rows.
-#' @param nObs Number of observations to draw. Can be a single integer or a vector of integers. This will be coerced to integer(s).
+#' @param sampleErr Double precision. Sampling error as standard deviation of a normally distributed variable.
 #'
 #'
 #' @export
@@ -16,16 +16,15 @@
 #' @import sf
 #' @import dplyr
 
-sampleBin <- function(map,
+sampleNorm <- function(map,
                       column,
                       subFylke = NULL,
                       subKommune = NULL,
                       gridCells = NULL,
                       nSites = NULL,
-                      nObs = 1){
+                      sampleErr = 0){
 
-  if(!is.null(gridCells) & !is.null(n)) stop("Don't specify gridCells AND n at the same time.")
-  nObs <- as.integer(nObs)
+  if(!is.null(gridCells) & !is.null(nSites)) stop("Don't specify gridCells AND n at the same time.")
 
   sub <- map
 
@@ -49,8 +48,7 @@ sampleBin <- function(map,
 
 
   sub <- sub %>%
-    dplyr::mutate(nVisits = nObs,
-                  nFound = rbinom(nrow(.), nObs, get(column)))
+    dplyr::mutate(nFound = rnorm(nrow(.), sampleErr, get(column)))
 
   return(sub)
 

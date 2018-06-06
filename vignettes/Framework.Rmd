@@ -21,6 +21,8 @@ knitr::opts_chunk$set(
 
 ```{r}
 require(tidyverse)
+require(sf)
+require(ggplot2)
 #require(InsectSurvPower)
 ```
 
@@ -53,7 +55,7 @@ Load map on 10km scale
 ```{r}
 #postgresConnect()
 #map10km <- getSSBGrid()
-data(map10km)
+#data(map10km) ##not needed with lazy loading
 ```
 
 ```{r}
@@ -88,11 +90,208 @@ mapOcc5years %>%
 ```{r}
 mapOcc5years %>% 
   filter(year == 5) %>%
-  select(prob) %>% 
+  select(ARTYPE) %>% 
   plot()
 
 ```
 
+
+Test artype diffs and trends
+------------
+
+```{r}
+mapOcc5years %>% 
+  filter(year == 1) %>%
+  select(ARTYPE, prob) %>% 
+    ggplot(.) + 
+  geom_bar(aes(x = ARTYPE, y = prob, fill = ARTYPE), 
+           position = "dodge", stat = "summary", fun.y = "mean")
+
+
+```
+
+
+```{r}
+artype5years <- createOccProb(map10km, 
+                              intercept = 0.5,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05,
+                              nYears = 5,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              artypeEff = c("Bebygd" = 2,
+                                        "Samferdsel" = -4,
+                                        "Fulldyrka jord" = 0,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0)
+)
+
+
+```
+
+
+
+```{r}
+artype5years %>% 
+  filter(year == 1) %>%
+  select(ARTYPE, prob) %>% 
+    ggplot(.) + 
+  geom_bar(aes(x = ARTYPE, y = prob, fill = ARTYPE), 
+           position = "dodge", stat = "summary", fun.y = "mean")
+
+
+```
+
+
+Artype trends
+-------------------
+
+
+```{r}
+artype10yearsTrend <- createOccProb(map10km, 
+                              intercept = -2,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              artypeEff = c("Bebygd" = 2,
+                                        "Samferdsel" = -40,
+                                        "Fulldyrka jord" = 1,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 1,
+                                        "Åpen fastmark" = -1,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0),
+                              artypeTrend = c("Bebygd" = 0,
+                                        "Samferdsel" = -1,
+                                        "Fulldyrka jord" = 0.5,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = -.5,
+                                        "Åpen fastmark" = .5,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0)
+)
+
+
+```
+
+
+```{r}
+artype10yearsTrend %>% 
+  select(ARTYPE, prob, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = prob, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+```{r}
+artype10yearsTrend <- createOccProb(map10km, 
+                              intercept = 0.84729,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              artypeEff = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 2,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = -1,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0),
+                              artypeTrend = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 0,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0)
+)
+
+```
+
+
+```{r}
+artype10yearsTrend %>% 
+  select(ARTYPE, prob, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = prob, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+
+```{r}
+require(lme4)
+
+timeTrendSample <- sampleBin(artype10yearsTrend, column = "prob", nSites = 400, nObs = 20)
+
+
+timeTrendSample %>% 
+  select(ARTYPE, prob, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = prob, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+```{r}
+
+timeTrendMod <- glmer(cbind(nFound, nVisits - nFound) ~ year*ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
+
+summary(timeTrendMod)
+
+mod1 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
+summary(mod1)
+
+mod2 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
+summary(mod2)
+
+mod3 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE:year + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
+summary(mod3)
+
+```
 
 
 
@@ -190,3 +389,73 @@ summary(mod4)
 ```
 
 Looks pretty good. Time trend rather well estimated. This corresponds to a cumulative decrease of about 22% over 5 years.
+
+
+
+Test normal distributed data simulation
+---------------
+
+```{r}
+normTrend <- createOccNorm(map10km, 
+                              intercept = 22,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05,
+                              nYears = 10,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              artypeEff = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 2,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = -1,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0),
+                              artypeTrend = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 0,
+                                        "Overflatedyrka jord" = 0.05,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0.10,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0)
+)
+```
+
+```{r}
+normTrend %>% 
+  select(ARTYPE, norm, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = norm, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+```{r}
+normData <- sampleNorm(normTrend, column = "norm", nSites = 400, sampleErr = 0)
+
+normData %>% 
+  select(ARTYPE, norm, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = norm, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+
+mod1 <- lmer(norm ~ year*ARTYPE + (1|fylke) + (1|kommune), data = normData)
+summary(mod1)
+
+```
+
