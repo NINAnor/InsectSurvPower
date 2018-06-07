@@ -1,4 +1,4 @@
-#' sampleNorm
+#' samplePois
 #'
 #'
 #' @param column Column to draw samples from.
@@ -16,13 +16,12 @@
 #' @import sf
 #' @import dplyr
 
-sampleNorm <- function(map,
-                      column,
-                      subFylke = NULL,
-                      subKommune = NULL,
-                      gridCells = NULL,
-                      nSites = NULL,
-                      sampleErr = 0){
+samplePois <- function(map,
+                       column,
+                       subFylke = NULL,
+                       subKommune = NULL,
+                       gridCells = NULL,
+                       nSites = NULL){
 
   if(!is.null(gridCells) & !is.null(nSites)) stop("Don't specify gridCells AND n at the same time.")
 
@@ -48,7 +47,7 @@ sampleNorm <- function(map,
 
 
   sub <- sub %>%
-    dplyr::mutate(amount = rnorm(nrow(.), sampleErr, get(column)))
+    dplyr::mutate(nCount = rpois(nrow(.), get(column)))
 
   return(sub)
 

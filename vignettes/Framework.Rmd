@@ -270,9 +270,9 @@ timeTrendSample <- sampleBin(artype10yearsTrend, column = "prob", nSites = 400, 
 
 
 timeTrendSample %>% 
-  select(ARTYPE, prob, year) %>% 
+  select(ARTYPE, nFound, year) %>% 
     ggplot(.) + 
-  geom_line(aes(x = year, y = prob, color = ARTYPE), 
+  geom_line(aes(x = year, y = nFound, color = ARTYPE), 
             stat = "summary", fun.y = "mean", lwd =2)
 
 ```
@@ -448,9 +448,9 @@ normTrend %>%
 normData <- sampleNorm(normTrend, column = "norm", nSites = 400, sampleErr = 0)
 
 normData %>% 
-  select(ARTYPE, norm, year) %>% 
+  select(ARTYPE, amount, year) %>% 
     ggplot(.) + 
-  geom_line(aes(x = year, y = norm, color = ARTYPE), 
+  geom_line(aes(x = year, y = amount, color = ARTYPE), 
             stat = "summary", fun.y = "mean", lwd =2)
 
 
@@ -459,3 +459,71 @@ summary(mod1)
 
 ```
 
+Test Poisson count
+-------------------
+
+
+```{r}
+poisTrend <- createOccPois(map10km, 
+                              intercept = 22,
+                              sigmaFylke = 0.4, 
+                              sigmaKommune = 0.1, 
+                              sigmaGrid = 0.05,
+                              nYears = 10,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0.01,
+                              sigmaKommuneTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F,
+                              artypeEff = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 2,
+                                        "Overflatedyrka jord" = 0,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = -1,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0),
+                              artypeTrend = c("Bebygd" = 0,
+                                        "Samferdsel" = 0,
+                                        "Fulldyrka jord" = 0,
+                                        "Overflatedyrka jord" = 0.05,
+                                        "Innmarksbeite" = 0,
+                                        "Skog" = 0.10,
+                                        "Åpen fastmark" = 0,
+                                        "Myr" = 0,
+                                        "Isbre" = 0,
+                                        "Ferskvann" = 0,
+                                        "Hav" = 0,
+                                        "Ikke kartlagt" = 0)
+)
+```
+
+```{r}
+poisTrend %>% 
+  select(ARTYPE, lambda, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = lambda, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+```{r}
+countData <- samplePois(poisTrend, column = "lambda", nSites = 4000)
+
+countData %>% 
+  select(ARTYPE, nCount, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = nCount, color = ARTYPE), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+countData$id <- 1:nrow(countData)
+mod1 <- glmer(nCount ~ year*ARTYPE + (1|fylke) + (1|kommune), data = countData, family = "poisson")
+summary(mod1)
+
+```
+aRw8GEF6
