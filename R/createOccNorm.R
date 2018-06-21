@@ -22,7 +22,6 @@
 
 createOccNorm <- function(map,
                           intercept = 0.5,
-                          formula = ~ NULL,
                           sigmaFylke = 0.1,
                           sigmaKommune = 0.1,
                           sigmaGrid = 0,
@@ -56,6 +55,7 @@ createOccNorm <- function(map,
                           ),
                           nYears = 5,
                           interceptTrend = -0.05,
+                          sdInterceptTrend = 0,
                           sortFylke = T,
                           sortKommune = T,
                           sortGrid = T){
@@ -123,7 +123,7 @@ createOccNorm <- function(map,
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                  norm = intercept + interceptTrend * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff
+                  norm = intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff
 )
 
     }

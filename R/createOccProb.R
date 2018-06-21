@@ -56,6 +56,7 @@ createOccProb <- function(map,
                           ),
                           nYears = 5,
                           interceptTrend = -0.05,
+                          sdInterceptTrend = 0,
                           sortFylke = T,
                           sortKommune = T,
                           sortGrid = T) {
@@ -129,8 +130,8 @@ createOccProb <- function(map,
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                   prob = exp(artypeEff + artypeTrend * i + intercept + interceptTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)/
-                     (1 + exp(artypeEff + artypeTrend * i + intercept + interceptTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)))
+                   prob = exp(artypeEff + artypeTrend * i + intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)/
+                     (1 + exp(artypeEff + artypeTrend * i + intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)))
 
          }
 

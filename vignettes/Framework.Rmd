@@ -26,8 +26,125 @@ require(ggplot2)
 #require(InsectSurvPower)
 ```
 
+**Todo:**
 
-Insect surve scheme - Power analysis
+* Loop function
+  - input til gen prob
+  - input til sample_
+  - make umbrella function to sample_?
+  - input to model
+  - store estimates and sds
+* Redo sample function to allow diff strategies
+  -  
+
+
+
+Sampling strategies
+===========
+Total timespan T need to be set so that T modulo t = 1
+
+Sampling capacity each year: a
+Total length of time: T
+Resampling timespan per locality: t
+Number of localities possible: l
+Total number of samples: s
+Replicate per location: r
+
+
+number of localities is (always): l = t * a
+number of samples is (always) : s = T * a
+
+maximum t is T / a 
+min t is 1
+
+
+
+Strat 1: minimal resampling timespan (1year)
+---------------
+t = 1 (by definition)
+l = t * a 
+s = T * a
+
+Strat 2: maximal length of resampling timespan (T) (silly example)
+---------------
+t = T
+l = a
+s = a * 2
+
+Strat 3: maximal length of resampling and maximal number of locations and balanced data set
+--------------
+t = floor(T / a) (max value) 
+t= T / a (if T %% a = 0) 
+tmax = (T - 1) / 2
+tmin = 1
+
+
+l = t * a
+s = T * a
+r = T / t
+
+r decreases as l increases through r = T + beta * l, where beta = (-1 + 1 / T) / a. Maximum beta = -1, minimum = 0,
+
+Possible values of t (resampling time is when modulo((T - 1), t) = 0 )
+
+```{r}
+invmodulo <- function(T){
+   which(T %% 1:T == 0)
+}
+```
+```{r}
+invmodulo(20)
+```
+
+
+
+Plot this and make grid example of rotation between sites.
+
+
+```{r}
+
+r <- function(T, a, l){
+  r <- T + ((-1 + 1/T) / a) * l
+  
+  out <- dplyr::tibble(a = a, T = T, reps = r, locations = l)
+  return(out)
+}
+```
+
+
+
+```{r}
+df <- sampleAlternatives(maxTime = 20,  maxCapacity= 40, stepsCapacity = 10)
+
+```
+
+
+```{r}
+plot(sampleAlternatives(maxTime = 40,  
+                        maxCapacity= 40, 
+                        stepsCapacity = 10), 
+     color = "resampleTime", 
+     allTicks = F)
+```
+
+```{r}
+plot(sampleAlternatives(maxTime = 9,  maxCapacity= 3, stepsCapacity = 1), color = "totSamples")
+```
+
+```{r}
+plot(sampleAlternatives(maxTime = 12,  maxCapacity= 300, stepsCapacity = 60), color = "resampleTime")
+```
+
+Bumblebee & butterfly example
+```{r}
+plot(sampleAlternatives(maxTime = 12,  maxCapacity= 18, stepsCapacity = 18), color = "resampleTime")
+```
+
+
+
+
+
+Insect survey scheme - Power analysis
 ============
 For the general insect survey power analysis, the basic idea is to 
 1.  first create a general framework that simulates insect communities throughout the country,
@@ -112,7 +229,7 @@ mapOcc5years %>%
 
 
 ```{r}
-artype5years <- createOccProb(map10km, 
+system.time(artype5years <- createOccProb(map10km, 
                               intercept = 0.5,
                               sigmaFylke = 0.4, 
                               sigmaKommune = 0.1, 
@@ -136,7 +253,7 @@ artype5years <- createOccProb(map10km,
                                         "Ferskvann" = 0,
                                         "Hav" = 0,
                                         "Ikke kartlagt" = 0)
-)
+))
 
 
 ```
@@ -212,7 +329,7 @@ artype10yearsTrend %>%
 ```
 
 ```{r}
-artype10yearsTrend <- createOccProb(map10km, 
+system.time(artype10yearsTrend <- createOccProb(map10km, 
                               intercept = 0.84729,
                               sigmaFylke = 0.4, 
                               sigmaKommune = 0.1, 
@@ -248,7 +365,7 @@ artype10yearsTrend <- createOccProb(map10km,
                                         "Ferskvann" = 0,
                                         "Hav" = 0,
                                         "Ikke kartlagt" = 0)
-)
+))
 
 ```
 
@@ -266,7 +383,7 @@ artype10yearsTrend %>%
 ```{r}
 require(lme4)
 
-timeTrendSample <- sampleBin(artype10yearsTrend, column = "prob", nSites = 400, nObs = 20)
+system.time(timeTrendSample <- sampleBin(artype10yearsTrend, column = "prob", nSites = 400, nObs = 20))
 
 
 timeTrendSample %>% 
@@ -382,7 +499,7 @@ sample5years <- sampleBin(years5, column = "prob", nSites = 4000, nObs = 10)
 
 ```{r}
 require(lme4)
-mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (year|fylke) + (1|kommune), family = "binomial", data = sample5years)
+system.time(mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (year|fylke) + (1|kommune), family = "binomial", data = sample5years))
 
 summary(mod4)
 
@@ -396,13 +513,14 @@ Test normal distributed data simulation
 ---------------
 
 ```{r}
-normTrend <- createOccNorm(map10km, 
+system.time(normTrend <- createOccNorm(map10km, 
                               intercept = 22,
                               sigmaFylke = 0.4, 
                               sigmaKommune = 0.1, 
                               sigmaGrid = 0.05,
                               nYears = 10,
                               interceptTrend = -0.05,
+                              sdInterceptTrend = 0.01,
                               sigmaFylkeTrend = 0.01,
                               sigmaKommuneTrend = 0.01,
                               sortGrid = F, 
@@ -432,7 +550,7 @@ normTrend <- createOccNorm(map10km,
                                         "Ferskvann" = 0,
                                         "Hav" = 0,
                                         "Ikke kartlagt" = 0)
-)
+))
 ```
 
 ```{r}
@@ -445,7 +563,7 @@ normTrend %>%
 ```
 
 ```{r}
-normData <- sampleNorm(normTrend, column = "norm", nSites = 400, sampleErr = 0)
+system.time(normData <- sampleNorm(normTrend, column = "norm", nSites = 400, sampleErr = 0))
 
 normData %>% 
   select(ARTYPE, amount, year) %>% 
@@ -454,7 +572,7 @@ normData %>%
             stat = "summary", fun.y = "mean", lwd =2)
 
 
-mod1 <- lmer(norm ~ year*ARTYPE + (1|fylke) + (1|kommune), data = normData)
+system.time(mod1 <- lmer(norm ~ year*ARTYPE + (1|fylke) + (1|kommune), data = normData))
 summary(mod1)
 
 ```
@@ -513,7 +631,7 @@ poisTrend %>%
 ```
 
 ```{r}
-countData <- samplePois(poisTrend, column = "lambda", nSites = 4000)
+system.time(countData <- samplePois(poisTrend, column = "lambda", nSites = 4000))
 
 countData %>% 
   select(ARTYPE, nCount, year) %>% 
@@ -522,8 +640,8 @@ countData %>%
             stat = "summary", fun.y = "mean", lwd =2)
 
 countData$id <- 1:nrow(countData)
-mod1 <- glmer(nCount ~ year*ARTYPE + (1|fylke) + (1|kommune), data = countData, family = "poisson")
+system.time(mod1 <- glmer(nCount ~ year*ARTYPE + (1|fylke) + (1|kommune), data = countData, family = "poisson"))
 summary(mod1)
 
 ```
-aRw8GEF6
+
