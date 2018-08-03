@@ -1,0 +1,189 @@
+---
+title: "Sampling regimes with imperfect detection"
+author: "Jens Åström"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::pdf_document:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Intro
+=============
+I here show some effects of imperfect detection in species observation and explore alternative survey regimes. This is mostly relevant for rare species, and not for the general survey of insects. Early detection of alien species is another use case.
+
+The objective is to identify suitable sampling strategies for a couple of different scenarios, where we maximise the chances of detecting a species at least once while considering the economic costs. The basic principle here is that a species can be present in a sampling location with a given probability. The observers then have a given chance (probability) of detecting a species, if it is present. The total probability of of detecting a species will be dependent on both these probabilities, how many locations are visited, and how many visits we make at each location.
+
+
+If $\psi$ represents the occurrence probability and $\theta$ is the detection probability, the probability of observing the species at least once in $J$ locations visited $K$ times is: $$probObserv = (1 - (1 - \psi)^J) * (1 - (1 - \theta)^K))$$. The costs can be assumed to scale roughly linearly to the total amount of visits, i.e. $totalCost = J * K * c$, where $c$ is the cost of one visit/survey.
+
+
+First look
+=========
+
+We can explore how the overall probability of observing the species, and the associated costs depend on $\psi, \theta, J, K, c$ graphically. I have made a convenience function `obsProb` to calculate the values. A lot of the results seem pretty obvious in retrospect, but it is still worth plotting them to get a better feel for the possibilities.
+
+```{r}
+require(InsectSurvPower)
+require(dplyr)
+require(gridExtra)
+require(ggplot2)
+```
+
+We specify one or a range of values for occurrence probability in each location, detection probabilities, the number of locations visited, the number of visits per location, and the cost of each visit.
+
+```{r}
+obsDf <- obsProb(occProb = seq(0.01, 1, by = 0.05),
+                    detectProb = c(0.5, 0.8),
+                    locations = 30,
+                    visits =  4,
+                    visitCost = 5000)
+
+obsDf
+
+```
+The probability of observing the species at least once is found in the `obsProb` column, and the total cost in the column `totCost`. The function returns an object of a specific class with a custom plotting function. This makes repeated plottings easier. We can specify a grouping variable to split up the lines.
+
+```{r princPlot, fig.cap = "Observation probability for surveying a species with a detection probability of 0.5 in 30 locations, each visited 4 times. \\label{princPlot}"}
+plot(obsDf, group = "detectProb",
+     xVar = "occProb",
+     yVar = "obsProb",
+     titleVar = c("locations", "visits"), 
+     hline = 0.8)
+
+```
+
+Figure \ref{princPlot} has the stated goal of an observation probability (total detection probability) of 0.8. We can see that this is reached in this case approximately when the probability of occurrence in each location is 6%. 
+
+However, this is probably an unreasonably high value in the real world. If we assume more we search for rarer species, we find that reaching overall detacabilities above 80% can be challenging.
+
+```{r}
+rareLocDf <- obsProb(occProb = 0.001,
+                    detectProb = seq(0.4, 0.8, by = .2),
+                    locations = seq(30, 1000, by = 20),
+                    visits =  4,
+                    visitCost = 5000)
+
+rareLocDf
+
+```
+
+```{r rareLocPlot, fig.cap = "Observation probability for surveying a very rare species as function of sampled locations. \\label{rareLocPlot}"}
+plot(rareLocDf, group = "detectProb",
+     xVar = "locations",
+     yVar = "obsProb",
+     titleVar = c("occProb", "visits"), 
+     hline = 0.8)
+
+```
+
+In figure \ref{rareLocPlot}, we see that observing a very rare species requires visiting a large number of locations. In these cases, it doesn't really help to visit each location many times, as the overall probability is limited by the number of locations we visit. Figure \ref{rareVisitPlot} shows the results of maximising the number of visits in fixed, but large number of locations, for a very rare species.
+
+```{r}
+rareVisitDf <- obsProb(occProb = 0.001,
+                    detectProb = seq(0.4, 0.8, by = .2),
+                    locations = 250,
+                    visits =  seq(1, 21, by = 5),
+                    visitCost = 5000)
+
+rareVisitDf
+
+```
+
+```{r rareVisitPlot, fig.cap = "Observation probability for surveying a very rare species as function of sampled locations. \\label{rareVisitPlot}"}
+plot(rareVisitDf, group = "detectProb",
+     xVar = "visits",
+     yVar = "obsProb",
+     titleVar = c("occProb", "locations"), 
+     hline = 0.8)
+
+```
+
+Although the overall cost increases linerly with the total number of samples (figure \ref{rareCostPlot}), in cases with very rare species, this doesn't mean that the overall detection probability continues to increase indefinitely (figure \ref{rareBenefitPlot})
+
+```{r}
+rareCostDf <- obsProb(occProb = 0.001,
+                    detectProb = 0.4,
+                    locations = seq(50, 250, by = 50),
+                    visits =  seq(1, 21, by = 5),
+                    visitCost = 5000)
+
+rareCostDf
+
+```
+
+
+```{r rareCostPlot, fig.cap = "Total survey cost as a function of the total number of samples \\label{rareCostPlot}"}
+plot(rareCostDf, group = "locations",
+     xVar = "visits",
+     yVar = "totCost",
+     titleVar = "visitCost")
+```
+
+
+```{r rareBenefitPlot, fig.cap = "Total observation probability as a function of survey cost for a very rare species \\label{rareBenefitPlot}"}
+plot(rareVisitDf, group = "detectProb",
+     xVar = "obsProb",
+     yVar = "totCost",
+     titleVar = c("occProb", "locations"))
+```
+
+
+Some strategies
+==============
+As seen in figures \ref{rareLocPlot} and \ref{rareVisitPlot}, when we deal with very rare species, it is no use increasing the number of revisits to each location (or to spend money increasing the detection probability), if we can't at the same time span a very large number of locations. We should then concentrate on increasing the number of visited locations.
+
+Similarly, if detectability is low but presence is high, we should focus on increasing the number of revisits per location, instead of trying to cover many locations (figure \ref{lowDetectPlot}).
+
+```{r}
+lowDetectDf <- obsProb(occProb = 0.05,
+                    detectProb = 0.2,
+                    locations = seq(50, 250, by = 50),
+                    visits =  c(1, seq(5, 20, by = 5)),
+                    visitCost = 5000)
+
+lowDetectDf
+
+```
+
+```{r lowDetectPlot, fig.cap = "Observation probability for surveying a cryptic species as function of sampled locations. \\label{lowDetectPlot}"}
+plot(lowDetectDf, group = "visits",
+     xVar = "locations",
+     yVar = "obsProb",
+     titleVar = c("occProb", "detectProb"), 
+     hline = 0.8)
+
+```
+
+Plausible values?
+============
+It is difficult to just guess plausible values for occurrence and detectability, it is reasonable to assume quite low occurrence probabilities, since we are working on early detections. We can explore our possibilities of observing species that occurr in between 0.1 to 1% of all studied locations. We can set the number of locations to 100 and with two visits, as a reasonable possibility.
+
+```{r}
+
+guessDf <- obsProb(occProb = seq(0.001, 0.01, by = 0.001),
+                    detectProb = seq(0.2, 0.8, by = 0.2),
+                    locations = seq(100, 200, by = 100),
+                    visits =  seq(2, 8, by = 2),
+                    visitCost = 5000)
+
+guessDf
+```
+
+
+```{r guessPlot, fig.cap = "Observation probability for plausible combinations of values, divided into number of sample locations in columns, and number of visits in rows. \\label{guessPlot}"}
+#layout(matrix(1:6, 2, 3, byrow = T))
+#layout.show(6)
+plot(guessDf, group = "detectProb",
+     xVar = "occProb",
+     yVar = "obsProb",
+      hline = 0.8) + 
+  facet_grid(visits ~ locations) 
+
+```
+
+
+
