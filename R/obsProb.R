@@ -99,11 +99,12 @@ return(out)
 
 #' @export
 plot.obsProb <- function(input,
-                            group,
-                            yVar,
-                            xVar,
-                            titleVar = NULL,
-                            hline = NULL){
+                         group,
+                         yVar,
+                         xVar,
+                         titleVar = NULL,
+                         hline = NULL,
+                         ...){
 
   ##match args here
   input[[group]] <- as.factor(input[[group]])
@@ -115,7 +116,7 @@ plot.obsProb <- function(input,
                   color = get(group),
                   group = get(group)
                   ),
-                  lwd = 1.5
+                  ...
               ) +
      ggplot2::scale_colour_discrete(name = group) +
      ggplot2::xlab(xVar) +
@@ -137,6 +138,7 @@ plot.obsProb <- function(input,
      p <- p + ggplot2::geom_hline(yintercept = hline, linetype = "dashed" , color = "black")
 
    }
+
 
    # if(confBands){
    #   p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = get(yVar) - 1.96 * std.error,
