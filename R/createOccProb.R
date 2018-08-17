@@ -143,5 +143,9 @@ createOccProb <- function(map,
 
 
   }
+
+  combined <- combined %>%
+    mutate(KOMMUNENUMMER = as.integer(KOMMUNENUMMER))
+
   return(combined)
 }

@@ -19,11 +19,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
+```{r, include = F}
 require(tidyverse)
 require(sf)
-require(ggplot2)
-#require(InsectSurvPower)
+#require(ggplot2)
+require(InsectSurvPower)
 ```
 
 **Todo:**
@@ -41,147 +41,247 @@ require(ggplot2)
 
 Sampling strategies
 ===========
-Total timespan T need to be set so that T modulo t = 1
 
-Sampling capacity each year: a
-Total length of time: T
-Resampling timespan per locality: t
-Number of localities possible: l
-Total number of samples: s
-Replicate per location: r
-
-
-number of localities is (always): l = t * a
-number of samples is (always) : s = T * a
-
-maximum t is T / a 
-min t is 1
-
-
-
-Strat 1: minimal resampling timespan (1year)
----------------
-t = 1 (by definition)
-l = t * a 
-s = T * a
-
-Strat 2: maximal length of resampling timespan (T) (silly example)
----------------
-t = T
-l = a
-s = a * 2
-
-Strat 3: maximal length of resampling and maximal number of locations and balanced data set
---------------
-t = floor(T / a) (max value) 
-t= T / a (if T %% a = 0) 
-tmax = (T - 1) / 2
-tmin = 1
-
-
-l = t * a
-s = T * a
-r = T / t
-
-r decreases as l increases through r = T + beta * l, where beta = (-1 + 1 / T) / a. Maximum beta = -1, minimum = 0,
-
-Possible values of t (resampling time is when modulo((T - 1), t) = 0 )
-
-```{r}
-invmodulo <- function(T){
-   which(T %% 1:T == 0)
-}
-```
-```{r}
-invmodulo(20)
-```
-
-
-
-Plot this and make grid example of rotation between sites.
+To revisit or not to revisit
+----------------------------
+When surveying locations to identify time trends, a common simple design is to pick a number of sites that you revisit over some time, revisiting all sites at all survey times. This way, you can account for and limit the effect of consistent differences between sites. If, for example, one site show consistently higher values than another, they may still show the same trend, and revisiting the sites helps us account for these systematic differences. Figure \ref{revisitPlot} shows a hypothetical example of 5 kommunes that differ in their overall values, but follow the same time trend. If the overall levels differ between sites, but they follow the same overall time trend, it makes sense to revisit each location at every sampling time. Since they follow the same trend, you don't have to visit many locations to identify the underlying common trend.
 
 
 ```{r}
 
-r <- function(T, a, l){
-  r <- T + ((-1 + 1/T) / a) * l
-  
-  out <- dplyr::tibble(a = a, T = T, reps = r, locations = l)
-  return(out)
-}
-```
 
-
-
-```{r}
-df <- sampleAlternatives(maxTime = 20,  maxCapacity= 40, stepsCapacity = 10)
+system.time(test5yearsTrend <- createOccNorm(map10km, 
+                              intercept = 10,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0.5, 
+                              sigmaGrid = 0.5,
+                              nYears = 5,
+                              interceptTrend = -0.1,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+            )
 
 ```
 
 
-```{r}
-plot(sampleAlternatives(maxTime = 40,  
-                        maxCapacity= 40, 
-                        stepsCapacity = 10), 
+```{r revisitPlot, fig.cap = "Hypothetical time trends for 4 kommunes that follow the same time trend but have diffent overall levels. \\label{revisitPlot}"}
+test5yearsTrend %>% 
+  filter(KOMMUNENUMMER < 110) %>% 
+    select(kommune, KOMMUNENUMMER, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = kommune), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+But all locations might not follow the same time trend so closely. If the locations have varying trends, as in figure \ref{spreadPlot}, it becomes harder to identify a potential underlying, common trend. In this case, we need to visit more individual locations to be able to identify the underlying trend. This might mean that we cannot revisit each site each year within the constraints of the budget. We may then have to stagger our visits, so that we revisit each location every other year, or every fourth year, to be able to cover more locations.
+
+
+```{r, echo = F}
+
+varying5yearsTrend <- createOccNorm(map10km, 
+                              intercept = 10,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0.5, 
+                              sigmaGrid = 0.5,
+                              nYears = 5,
+                              interceptTrend = -0.1,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = .4,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F
+                              
+)
+
+```
+
+
+```{r spreadPlot, echo = F, fig.cap = "Hypothetical time trends for 4 kommunes that follow the same underlying time trend but have diffent overall levels, and also vary in individual time trends. \\label{spreadPlot}"}
+varying5yearsTrend %>% 
+  filter(KOMMUNENUMMER < 110) %>% 
+    select(kommune, KOMMUNENUMMER, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = kommune), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+```
+
+This means we end up with a trade-off between revisiting schedule and the number of locations to visit, given that we can only visit so many locations each year. Figures \ref{onePlot}, \ref{twoPlot}, \ref{threePlot}, and \ref{sixPlot} shows the various ways we could allocate a yearly capacity of surveying 6 locations a year, for 6 years, while keeping the number of times each location is visited the same for all locations (a balanced data set).  
+
+```{r onePlot, echo = F, fig.cap = "6 locations visited each year. 6 samples per location for a total of 36 samples. \\label{oncePlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 6:1), "year" = 1:6)) 
+dat$visit <- 1
+dat
+
+
+ggplot(dat, aes(y=Location, x=year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = "green") 
+```
+
+
+
+```{r twoPlot, echo = F, fig.cap = "12 locations visited every other year. 3 samples per location for a total of 36 samples. \\label{twoPlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 12:1), "year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$year == 1] <- rep(c(0, 1), 6)
+dat$visit[dat$year == 2] <- rep(c(1, 0), 6)
+dat$visit[dat$year == 3] <- rep(c(0, 1), 6)
+dat$visit[dat$year == 4] <- rep(c(1, 0), 6)
+dat$visit[dat$year == 5] <- rep(c(0, 1), 6)
+dat$visit[dat$year == 6] <- rep(c(1, 0), 6)
+
+
+
+ggplot(dat, aes(y=Location, x=year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "green"))
+
+```
+
+```{r threePlot, echo = F, fig.cap = "18 locations visited every third year. 2 samples per location for a total of 36 samples. \\label{threePlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 18:1), "year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$year == 1] <- rep(c(0, 0, 1), 6)
+dat$visit[dat$year == 2] <- rep(c(0, 1, 0), 6)
+dat$visit[dat$year == 3] <- rep(c(1, 0, 0), 6)
+dat$visit[dat$year == 4] <- rep(c(0, 0, 1), 6)
+dat$visit[dat$year == 5] <- rep(c(0, 1, 0), 6)
+dat$visit[dat$year == 6] <- rep(c(1, 0, 0), 6)
+
+
+
+ggplot(dat, aes(y=Location, x=year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "green")) 
+```
+
+
+```{r sixPlot, echo = F, fig.cap = "36 locations visited once. 1 sample per location for a total of 36 samples. \\label{sixPlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 36:1), "year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$year == 1] <- rep(c(0, 0, 0, 0, 0, 1), 6)
+dat$visit[dat$year == 2] <- rep(c(0, 0, 0, 0, 1, 0), 6)
+dat$visit[dat$year == 3] <- rep(c(0, 0, 0, 1, 0, 0), 6)
+dat$visit[dat$year == 4] <- rep(c(0, 0, 1, 0, 0, 0), 6)
+dat$visit[dat$year == 5] <- rep(c(0, 1, 0, 0, 0, 0), 6)
+dat$visit[dat$year == 6] <- rep(c(1, 0, 0, 0, 0, 0), 6)
+
+ggplot(dat, aes(y=Location, x=year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "green")) 
+```
+
+
+There are some rules of how such survey schemes can be set up in a balanced way. For simplicity, we limit our explorations to balanced cases.
+
+We can define these parameters: 
+$$
+\begin{aligned}
+Sampling~ capacity~ each~ year: a \\
+Total~ timespan~ of~ survey: T \\
+Resampling~ interval~ per~ locality: t \\
+Number~ of~ localities: l \\
+Total~ number~ of~ samples: s \\
+Replicates~ per~ location: r
+\end{aligned}
+$$
+
+The number of localities that we can survey is then $l = t * a$, which can be maximised by maximising $t$ to $t = T$. The minimum timespan between revisits in a location is $t = T / a$, which also minimizes the total number of locations. However, the number of samples per location $r$ is at the same time maximized as this follows $r = T / t$. The total number of samples is defined as $s = T * a$. Lastly, balanced survey schemes relies on the total survey length being evenly divisible by the yearly total survey capacity, i.e. as long as $T\bmod a=0$. 
+
+The possible survey schemes from relationships can be calculated by the custom function sampleAlternatives for convenience, which creates an object with its own plot method. Figure \ref{resampPlot} show how the number of possible locations and replicates (visits) per location depend on the yearly survey capacity and the time lag between visits to each location. As the figure shows, you can survey a staggering amount of locations in 40 years, if you are willing drastically lower the number of revisits. The trade-off between the number of locations and the number of visits per location is pretty sharp, and it is difficult to achieve high numbers in both, even with a high yearly capacity.
+
+
+```{r resampPlot, fig.cap = "The relationship between number of surveyed locations and replicates per location for different survey staggering times and yearly survey capacities. \\label{resampPlot}"}
+testSampleAlt <- sampleAlternatives(maxTime = 40,  
+                        maxCapacity= 400, 
+                        stepsCapacity = 100)
+
+class(testSampleAlt)
+     
+plot(testSampleAlt,
      color = "resampleTime", 
      allTicks = F)
 ```
 
-```{r}
+It is important to keep in mind the time span on the survey effort, within which we expect to evaluate the results. For most programs, it would be unreasonably long to have to wait 40 years to evaluate possible time trends. Figures \ref{T9a3Plot} and \ref{T9a300Plot} show a more reasonable time span of 9 years, with low and high yearly capacities, respectively.
+
+
+```{r T9a3Plot, fig.cap = "Possible survey schemes with low yearly capacity over 9 years. Colors represent the total number of samples, and symbol types represent different yearly capacities. \\label{T9a3Plot}"}
 plot(sampleAlternatives(maxTime = 9,  maxCapacity= 3, stepsCapacity = 1), color = "totSamples")
 ```
 
-```{r}
-plot(sampleAlternatives(maxTime = 12,  maxCapacity= 300, stepsCapacity = 60), color = "resampleTime")
+```{r T12a300Plot, fig.cap = "Possible survey schemes with high yearly capacity over 12 years. Colors represent the total number of samples, and symbol types represent different yearly capacities.\\label{T9a300Plot}"}
+plot(sampleAlternatives(maxTime = 9,  maxCapacity= 300, stepsCapacity = 60), color = "totSamples")
 ```
 
-Bumblebee & butterfly example
-```{r}
-plot(sampleAlternatives(maxTime = 12,  maxCapacity= 18, stepsCapacity = 18), color = "resampleTime")
+For an active real world example, we can plot the situation for the bumblebee and butterfly survey. This survey is done each year in 18 locations for each of three regions, together comprising 54 locations. The survey has been active since 2009 and thus exemplifies the results of potential schemes in the year 2021. Today, we revisit the same locations each year, resulting in 18 locations per region. But if we where to revisit each site only every third year, we could visit 54 locations 4 times in the same time span. Or for all regions, instead of visiting 54 locations 12 times, we could visit 162 locations 3 times each, figure \ref{T12a54Plot}.
+
+```{r T12a18Plot, fig.cap = "Possible survey schemes with a the same yearly capacity as the bumblebee and butterfly survey. This survey is done each year in 18 locations for each of three regions, together comprising 54 locations. The different lines/symbols thus represent including 1, 2, or all three regions in an analysis. \\label{T12a54Plot}"}
+plot(sampleAlternatives(maxTime = 12,  maxCapacity= 54, stepsCapacity = 18), color = "resampleTime")
 ```
 
-
+The optimal strategy will vary depending on the various sources of variation. A high yearly variability increases the need for multiple samples per location, while a high variability between sites increases the need to visit many sites. If we are interested in the absolute numbers in each region, and this varies by sites, we must visit more sites per region. If we are interested in the trends in each region, and these trends vary by site, we also need to visit more sites per region. It is not easy working out the optimal strategy, or calculate the statistical power of various survey schemes analytically. We need to simulate various situations and test out different strategies.  
 
 
 
 Insect survey scheme - Power analysis
 ============
-For the general insect survey power analysis, the basic idea is to 
-1.  first create a general framework that simulates insect communities throughout the country,
+For the general insect survey power analysis, the workflow for a power analysis is to 
+
+1.  create a general framework that simulates insect communities throughout the country,
+    a. this includes generating underlying distribution parameters, and
+    b. drawing samples from these distributions
 2.  use this method to generate many simulated insect communities under different scenarios
 3.  sample this community, mimicking various survey schemes
 4.  calculate statistics on the power and general accuracy of the survey scheme.
 
-The best case scenario would be to simulate the communities in a way that is as similar as possible to a future model of the findings in the samples. Then we could feed the parameter estimates from these models back to the simulation routine to update the power analysis. 
+We simulate the communities in a way that is as similar as possible to the models that would be used to analyze real data. There are two main reasons for this. First, it makes it possible to troubleshoot the process by simulating and analysing the data using the same basic model. Secondly, the parameter estimates are relevant to the real world scenarios, for instance making it possible to feed the parameter estimates from future models on real data back to the simulation routine, to update the power analysis. 
+
+Different types of variables are relevant to insect survey schemes. First we may want to model occurrences of individual species, using presence absence data. This would typically be done in a logistic regression using a binomial distribution. Secondly, we may want to record data such as the biomass of the whole sample or a specific taxa, which would be normally distributed. Lastly, we want to analyse count data, of the amount of individuals, or the amount of species in a sample. This is typically done via a Poisson distribution. For all of these three cases, the statistical models will try to estimate the parameters of these distributions.
+
+Data simulation
+-----------------------
+The data generation is divided into two parts. First we produce a set of distribution parameters for each potential location. Locations are squared up with any of the ssb standard grids, so we could generate data on 250x250m, 500x500m, 1x1km, 5x5km, or 10x10km resolution. As already described, we can choose to produce occurrence probatilities for a binomial distribution, means for a normal distribution, or lambdas for a Poisson distribution. This is the underlying process parameters that we will try to estimate from the sampled data. 
+
+Second, we simulate observing actual measurements, or drawing samples from these distributions, which constitutes the observation model. This is then constitutes the observed data. These both steps will be made many times, and the resulting dataset will be analysed, to empirically estimate the power of various sampling schemes.
+
+I have created some routines to ease thes repetative steps.
 
 
-**I'm currently contemplating two different approaches to simulate the occurrences.**
-
-1.  Simulate measurement values for each SSB 500 grid, based on predictor variables for each grid cell. These might include polynomials on lat and lon, to control for spatial autocorrelation not covered by the explanatory data. 
-2.  For each species, simulate a species distribution, which collectively adds up to local communities. This is a desired end product, but might be more difficult. It includes more or less coherent distributions for each species. However, the simulation algorithm is probably far from the later used distribution models.
-
-Probably the 1st is the most workable.
-
-
-Sandbox on workflow
-===============
-
-Load map on 10km scale
+Accessing the SSB grids
 --------------
+I have made a function that pulls the ssb grid from NINAs postgis database, for a range of potential scales.
 
-```{r}
-#postgresConnect()
-#map10km <- getSSBGrid()
-#data(map10km) ##not needed with lazy loading
+```{r, eval = F}
+postgresConnect()
+map10km <- getSSBGrid()
 ```
+Note that the finer scale maps are quite large. I have also included the 10km scale grids in the package to make it self-contained. The map is of class `sf` and can be plotted by standard functions. When there is multiple value colums, we can select the one we'd like to plot.
 
 ```{r}
 map10km
 plot(map10km["kommune"], key.pos = NULL)
 ```
 
-Add variable column to the map
+
+
+Add occurrence probabilities
 -------------
+Here we create occurrence probabilities for all grid cells in the map, where the baseline probability (intercept) of occurrence is 0.5. In addition, each fylke has different probabilities, here varying randomly (normal) with a standard deviation of 0.4, and each kommune has varying occurrence probabilities in similar fashion, here varying with a standard deviation of 0.1. Lastly, there is "residual" random variation among all cells, here with a standard deviation of 0.05.
+
+We can also initiate an overall time trend, here the background probability decreases with 0.05 (5%) each year. The resulting probabilities is added in a column called `prob´, which we then can plot.
 
 ```{r}
 mapOcc5years <- createOccProb(map10km, 
@@ -191,12 +291,18 @@ mapOcc5years <- createOccProb(map10km,
                               sigmaGrid = 0.05,
                               nYears = 5,
                               interceptTrend = -0.05,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
                               sortGrid = F, 
                               sortFylke = F, 
                               sortKommune = F)
 
+class(mapOcc5years)
+
+```
+
+
+```{r examplePred1, fig.cap = "Example of simulated occurrence probabilities on a 10x10km scale, where the overall probability is 0.5, with added fylke level variation of sd = 0.4, and kommune level variation of sd = 0.1. \\label{examplePred1}"}
 mapOcc5years %>% 
   filter(year == 1) %>%
   select(prob) %>% 
@@ -204,6 +310,8 @@ mapOcc5years %>%
 
 
 ```
+
+The maps also contains information areal type according to the `AR5`-layer. This used for simulating varying occurrences by habitat type later on.
 ```{r}
 mapOcc5years %>% 
   filter(year == 5) %>%
@@ -211,437 +319,3 @@ mapOcc5years %>%
   plot()
 
 ```
-
-
-Test artype diffs and trends
-------------
-
-```{r}
-mapOcc5years %>% 
-  filter(year == 1) %>%
-  select(ARTYPE, prob) %>% 
-    ggplot(.) + 
-  geom_bar(aes(x = ARTYPE, y = prob, fill = ARTYPE), 
-           position = "dodge", stat = "summary", fun.y = "mean")
-
-
-```
-
-
-```{r}
-system.time(artype5years <- createOccProb(map10km, 
-                              intercept = 0.5,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05,
-                              nYears = 5,
-                              interceptTrend = -0.05,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              artypeEff = c("Bebygd" = 2,
-                                        "Samferdsel" = -4,
-                                        "Fulldyrka jord" = 0,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0)
-))
-
-
-```
-
-
-
-```{r}
-artype5years %>% 
-  filter(year == 1) %>%
-  select(ARTYPE, prob) %>% 
-    ggplot(.) + 
-  geom_bar(aes(x = ARTYPE, y = prob, fill = ARTYPE), 
-           position = "dodge", stat = "summary", fun.y = "mean")
-
-
-```
-
-
-Artype trends
--------------------
-
-
-```{r}
-artype10yearsTrend <- createOccProb(map10km, 
-                              intercept = -2,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05,
-                              nYears = 20,
-                              interceptTrend = -0.05,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              artypeEff = c("Bebygd" = 2,
-                                        "Samferdsel" = -40,
-                                        "Fulldyrka jord" = 1,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 1,
-                                        "Åpen fastmark" = -1,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0),
-                              artypeTrend = c("Bebygd" = 0,
-                                        "Samferdsel" = -1,
-                                        "Fulldyrka jord" = 0.5,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = -.5,
-                                        "Åpen fastmark" = .5,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0)
-)
-
-
-```
-
-
-```{r}
-artype10yearsTrend %>% 
-  select(ARTYPE, prob, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = prob, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-```
-
-```{r}
-system.time(artype10yearsTrend <- createOccProb(map10km, 
-                              intercept = 0.84729,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05,
-                              nYears = 20,
-                              interceptTrend = -0.05,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              artypeEff = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 2,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = -1,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0),
-                              artypeTrend = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 0,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0)
-))
-
-```
-
-
-```{r}
-artype10yearsTrend %>% 
-  select(ARTYPE, prob, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = prob, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-```
-
-
-```{r}
-require(lme4)
-
-system.time(timeTrendSample <- sampleBin(artype10yearsTrend, column = "prob", nSites = 400, nObs = 20))
-
-
-timeTrendSample %>% 
-  select(ARTYPE, nFound, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = nFound, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-```
-```{r}
-
-timeTrendMod <- glmer(cbind(nFound, nVisits - nFound) ~ year*ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
-
-summary(timeTrendMod)
-
-mod1 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
-summary(mod1)
-
-mod2 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
-summary(mod2)
-
-mod3 <- glmer(cbind(nFound, nVisits - nFound) ~ year + ARTYPE:year + (year|fylke) + (1|kommune), family = "binomial", data = timeTrendSample)
-summary(mod3)
-
-```
-
-
-
-Sample the map for species
----------------
-
-```{r}
-testSample <- sampleBin(map10km, column = "prob", nSites = 400, nObs = 1)
-plot(testSample["nFound"])
-```
-
-
-
-```{r}
-sampHordaland <- sampleBin(map10km, column = "prob", nSites = 100, nObs = 1, subFylke = "Hordaland")
-
-plot(sampHordaland["nFound"])
-
-```
-
-
-Model the findings
-----------------
-
-
-```{r}
-require(lme4)
-mod1 <- glmer(nFound ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = testSample)
-
-summary(mod1)
-
-```
-The estimates are reasonable but not exactly perfect. We can see how the improve when we add the number of observations per grid cell.
-
-
-```{r}
-obs10Sample <- sampleBin(map10km, column = "prob", nSites = 400, nObs = 10)
-plot(obs10Sample["nFound"])
-```
-
-```{r}
-require(lme4)
-mod2 <- glmer(cbind(nFound, nVisits - nFound) ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = obs10Sample)
-
-summary(mod2)
-
-```
-
-Let's see what happens if we drastically increase the number of grid cells sampled
-
-
-```{r}
-bigSample <- sampleBin(map10km, column = "prob", nSites = 4000, nObs = 10)
-plot(bigSample["nFound"])
-```
-
-```{r}
-mod3 <- glmer(cbind(nFound, nVisits - nFound) ~ 1 + (1|fylke) + (1|kommune), family = "binomial", data = bigSample)
-
-summary(mod3)
-
-```
-
-Not much different estistimates than from between a sample of 400 and 4000 grid cells. 
-
-
-Time trends
----------
-
-```{r}
-years5 <- createOccProb(map10km, 
-                              intercept = 0.5,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05, 
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              nYears = 5,
-                              interceptTrend = -0.05,
-                        sigmaFylkeTrend = 0.02,
-                        sigmaKommuneTrend = 0)
-
-```
-```{r}
-sample5years <- sampleBin(years5, column = "prob", nSites = 4000, nObs = 10)
-```
-
-```{r}
-require(lme4)
-system.time(mod4 <- glmer(cbind(nFound, nVisits - nFound) ~ year + (year|fylke) + (1|kommune), family = "binomial", data = sample5years))
-
-summary(mod4)
-
-```
-
-Looks pretty good. Time trend rather well estimated. This corresponds to a cumulative decrease of about 22% over 5 years.
-
-
-
-Test normal distributed data simulation
----------------
-
-```{r}
-system.time(normTrend <- createOccNorm(map10km, 
-                              intercept = 22,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05,
-                              nYears = 10,
-                              interceptTrend = -0.05,
-                              sdInterceptTrend = 0.01,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              artypeEff = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 2,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = -1,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0),
-                              artypeTrend = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 0,
-                                        "Overflatedyrka jord" = 0.05,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0.10,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0)
-))
-```
-
-```{r}
-normTrend %>% 
-  select(ARTYPE, norm, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = norm, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-```
-
-```{r}
-system.time(normData <- sampleNorm(normTrend, column = "norm", nSites = 400, sampleErr = 0))
-
-normData %>% 
-  select(ARTYPE, amount, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = amount, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-
-system.time(mod1 <- lmer(norm ~ year*ARTYPE + (1|fylke) + (1|kommune), data = normData))
-summary(mod1)
-
-```
-
-Test Poisson count
--------------------
-
-
-```{r}
-poisTrend <- createOccPois(map10km, 
-                              intercept = 22,
-                              sigmaFylke = 0.4, 
-                              sigmaKommune = 0.1, 
-                              sigmaGrid = 0.05,
-                              nYears = 10,
-                              interceptTrend = -0.05,
-                              sigmaFylkeTrend = 0.01,
-                              sigmaKommuneTrend = 0.01,
-                              sortGrid = F, 
-                              sortFylke = F, 
-                              sortKommune = F,
-                              artypeEff = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 2,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = -1,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0),
-                              artypeTrend = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 0,
-                                        "Overflatedyrka jord" = 0.05,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0.10,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0)
-)
-```
-
-```{r}
-poisTrend %>% 
-  select(ARTYPE, lambda, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = lambda, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-```
-
-```{r}
-system.time(countData <- samplePois(poisTrend, column = "lambda", nSites = 4000))
-
-countData %>% 
-  select(ARTYPE, nCount, year) %>% 
-    ggplot(.) + 
-  geom_line(aes(x = year, y = nCount, color = ARTYPE), 
-            stat = "summary", fun.y = "mean", lwd =2)
-
-countData$id <- 1:nrow(countData)
-system.time(mod1 <- glmer(nCount ~ year*ARTYPE + (1|fylke) + (1|kommune), data = countData, family = "poisson"))
-summary(mod1)
-
-```
-

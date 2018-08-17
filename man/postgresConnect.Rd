@@ -5,10 +5,10 @@
 \title{postgresConnect}
 \usage{
 postgresConnect(Username = "postgjest", Password = "gjestpost",
-  host = "ninpgsql03.nina.no")
+  host = "gisdata-db.nina.no")
 }
 \arguments{
-\item{host}{Name of database server. Defaults to (new) main PostgreSQL machine "ninpgsql03.nina.no".}
+\item{host}{Name of database server. Defaults to (new) main PostgreSQL machine "gisdata-db.nina.no".}
 
 \item{user}{Username, defaults to guest account with basic read privileges}
 
