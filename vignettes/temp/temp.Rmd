@@ -398,6 +398,83 @@ summary(mod1)
 
 ```
 
+
+```{r}
+system.time(normData <- sampleNorm(normTrend, 
+                                    column = "norm", 
+                                    yearlyCapacity = 400, 
+                                    sampleErr = 0, 
+                                    resampleTime = 1,
+                                    nYears = 10))
+
+normTrend %>% 
+  group_by(fylke) %>%
+  tally()
+
+normTrend$map <- normTrend$map %>% 
+  mutate(nyRegion = fylke)
+
+normTrend$map$nyRegion[normTrend$map$nyRegion == "Oslo"] <- "Akershus"
+
+
+system.time(normData <- sampleNorm(normTrend, 
+                                    column = "norm", 
+                                    yearlyCapacity = 25,
+                                    resampleWithin = "nyRegion",
+                                    sampleErr = 0, 
+                                    resampleTime = 5,
+                                    subFylke = NULL,
+                                    nYears = 10))
+
+sampleAlternatives(10, 25, 25)
+
+normData %>%
+  group_by(nyRegion) %>%
+  st_set_geometry(NULL) %>%
+  tally() %>% 
+  summarise(sum(n))
+  
+normData %>%
+  group_by(ssbid) %>%
+  st_set_geometry(NULL) %>%
+  tally()
+
+normData %>% 
+  select(nyRegion, amount, year) %>% 
+    ggplot(.) + 
+  geom_line(aes(x = year, y = amount, color = nyRegion), 
+            stat = "summary", fun.y = "mean", lwd =2)
+
+tt <- normData %>% 
+  group_by(ssbid) %>% 
+  slice(1)  
+
+plot(tt["norm"]) 
+  
+
+mySsbid <- unique(normData$ssbid)
+
+fixedSamp <- sampleNorm(normTrend,
+                        gridCells = mySsbid,
+                        yearlyCapacity = 10,
+                        nYears = 10,
+                        resampleTime = 5)
+
+
+fixedSamp %>%
+  group_by(ssbid) %>%
+  st_set_geometry(NULL) %>%
+  tally() 
+
+
+
+system.time(mod1 <- lmer(norm ~ year + nyRegion + (1|fylke) + (1|kommune), data = normData))
+summary(mod1)
+
+```
+
+
+
 Test Poisson count
 -------------------
 
@@ -452,7 +529,12 @@ poisTrend %>%
 ```
 
 ```{r}
-system.time(countData <- samplePois(poisTrend, column = "lambda", nSites = 4000))
+system.time(countData <- samplePois(poisTrend, 
+                                    column = "lambda", 
+                                    yearlyCapacity = 100,
+                                    resampleTime = 5,
+                                    nYear = 10
+                                      ))
 
 countData %>% 
   select(ARTYPE, nCount, year) %>% 

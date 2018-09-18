@@ -1,10 +1,17 @@
 #' sampleNorm
 #'
-#'
-#' @param column Column to draw samples from.
-#' @param gridCells Vector of which map grid cells to draw from, for repeated samples from the same grid cells. Incompatible with n.
-#' @param nSites Integer, number of new random grids to sample. Imcompatible with rows.
-#' @param sampleErr Double precision. Sampling error as standard deviation of a normally distributed variable.
+#' @param map a surveyHat object (data frame containing ssbids fylke and kommune colums, response colum and potential other grouping columns)
+#' @param nYears the number of years of the survey. Note that you need at least two years to have one revisit. Defaults to the timespan of the map.
+#' @param yearlyCapacity the total yearly survey capacity.
+#' @param resampleTime how many years between revisits? Defaults to 1 for yearly revisits.
+#' @param resampleWithin within which region (or other category) should the revisits be distributed.
+#' Ensures even sampling schemes in all regions. Note that all regions may get fewer locations if the yearlyCapacity and number of regions don't match up.
+#' @param column Column to draw samples from. Defaults to "norm" for normally distributed variables.
+#' @param subFylke optionally limit the draws to set of fylkes. Character vector.
+#' @param subKommune optionally limit the drawn cells to a set of kommunes. Character vector.
+#' @param gridCells Vector of which map grid cells to draw from, for repeated samples from the same grid cells. Overrides arguments associated
+#' with random draws of map cells.
+#' @param sampleErr Double precision. Sampling error as standard deviation of a normally distributed variable. (Only applicable to normal draws.)
 #'
 #'
 #' @export
@@ -16,83 +23,71 @@
 #' @import sf
 #' @import dplyr
 
+
+
 sampleNorm <- function(map,
-                      column,
-                      subFylke = NULL,
-                      subKommune = NULL,
-                      gridCells = NULL,
-                      nSites = NULL,
-                      sampleErr = 0){
-
-  if(!is.null(gridCells) & !is.null(nSites)) stop("Don't specify gridCells AND n at the same time.")
-
-  sub <- map
-
-  if(!is.null(subFylke)){
-    sub <- sub %>%
-      dplyr::filter(fylke %in% subFylke)
-  }
-
-  if(!is.null(subKommune)){
-    sub <- sub %>%
-      dplyr::filter(kommune %in% subKommune)
-  }
-
-  if(!is.null(gridCells)){
-    sub <- sub %>% filter(ssbid %in% gridCells)
-  } else {
-    randomGridCells <- sample(unique(sub$ssbid), nSites, replace = F)
-    sub <- sub %>%
-      dplyr::filter(ssbid %in% randomGridCells)
-  }
-
-
-  sub <- sub %>%
-    dplyr::mutate(amount = rnorm(nrow(.), sampleErr, get(column)))
-
-  return(sub)
-
-}
-
-#need to make check for large enough map (enough years)
-sampleNorm2 <- function(map,
-                        years = NULL,
+                        nYears = NULL,
                         yearlyCapacity = NULL,
-                        resampleTime = NULL,
-                        resampleWithin = c("none", "fylke", "kommune"),
+                        resampleTime = 1,
+                        resampleWithin = "none",
                         column = "norm",
                         subFylke = NULL,
                         subKommune = NULL,
                         gridCells = NULL,
                         sampleErr = 0){
 
-  resampleWithin <- match.arg(resampleWithin, c("none", "fylke", "kommune"))
+  map <- map$map
+
+  resampleWithin <- match.arg(resampleWithin, c(names(map), "none"))
+
+  if(is.null(nYears)){
+    nYears <- max(map$year)
+  }
 
   reSamp <- resampleTime
-  sampleAlt <- sampleAlternatives(maxTime = years, maxCapacity = yearlyCapacity, stepsCapacity = yearlyCapacity)
+  sampleAlt <- sampleAlternatives(maxTime = nYears, maxCapacity = yearlyCapacity, stepsCapacity = yearlyCapacity)
+  if(!(resampleTime %in% sampleAlt$resampleTime)){
+    stop(paste0("ResamplingTime needs to be one of ",
+                paste(sampleAlt$resampleTime, collapse = ", "),
+                " for a time period of ",
+                nYears,
+                " and yearly capacity of ",
+                yearlyCapacity))
+  }
   sampleAlt <- sampleAlt %>%
     filter(resampleTime == reSamp) %>%
     transmute_all(as.character) %>%
     transmute_all(as.integer)
 
-  ##Update this!
-  #if(!is.null(gridCells) & !is.null(nSites)) stop("Don't specify gridCells AND n at the same time.")
+
+  if(!is.null(gridCells) & resampleWithin != "none") stop("Don't specify gridCells AND resampleWithin at the same time.")
+  if(!is.null(gridCells) & !is.null(subFylke)) stop("Don't specify gridCells AND subFylke at the same time.")
+  if(!is.null(gridCells) & !is.null(subKommune)) stop("Don't specify gridCells AND subKommune at the same time.")
+
+  yearsInMap <- map %>%
+    sf::st_set_geometry(NULL) %>%
+    select(year) %>%
+    distinct() %>%
+    nrow
+
+  if(yearsInMap < nYears) stop(paste("surveyHat input (map) doesn't contain enough years to sample", nYears, "years."))
+
 
   sub <- map
 
-  if(!is.null(subFylke)){
+  if(!is.null(subFylke) & is.null(gridCells)){
     sub <- sub %>%
       dplyr::filter(fylke %in% subFylke)
   }
 
-  if(!is.null(subKommune)){
+  if(!is.null(subKommune) & is.null(gridCells)){
     sub <- sub %>%
       dplyr::filter(kommune %in% subKommune)
   }
 
   if(!is.null(gridCells)){
     sub <- sub %>% filter(ssbid %in% gridCells)
-  } else {
+  }
 
     stagger <- sapply(rep(0:(sampleAlt$resampleTime -1)),  FUN = function(x) (seq(from = min(sub$year) + x,
                                                                                   to = 2 * sampleAlt$timespan,
@@ -106,20 +101,23 @@ sampleNorm2 <- function(map,
       transmute_all(as.integer) %>%
       filter(selectYear <= sampleAlt$timespan)
 
-    noCells <- tibble("fylke" = length(unique(sub$fylke)),
-                      "kommune" = length(unique(sub$kommune))
-                      )
-    randomGridCells <- sub %>%
+
+    allGridCells <- sub %>%
       sf::st_set_geometry(NULL) %>%
       group_by(ssbid) %>%
       slice(1)
 
-  if(resampleWithin != "none"){
-    noCells <- noCells %>%
-      select(resampleWithin)
+    selectedGridCells <- allGridCells
 
+  if(resampleWithin != "none" & is.null(gridCells)){
 
-    table <- randomGridCells %>%
+    noCells <- sub %>%
+      sf::st_set_geometry(NULL) %>%
+      select(resampleWithin) %>%
+      distinct() %>%
+      nrow()
+
+    table <- allGridCells %>%
       group_by(get(resampleWithin)) %>%
       tally() %>%
       select(n)
@@ -130,7 +128,7 @@ sampleNorm2 <- function(map,
                 " with this sampling regime."))
     }
 
-    randomGridCells <- randomGridCells %>%
+    randomGridCells <- allGridCells %>%
       group_by(get(resampleWithin)) %>%
       sample_n(size = as.integer(ceiling(sampleAlt$locations / noCells)))
 
@@ -141,23 +139,27 @@ sampleNorm2 <- function(map,
       ungroup() %>%
       sample_n(size = toRemove)
 
-    randomGridCells <- randomGridCells %>%
+    selectedGridCells <- randomGridCells %>%
       filter(!(ssbid %in% removeFrom$ssbid))
-  } else {
+  }
 
-    randomGridCells <- randomGridCells %>%
+  if(resampleWithin == "none" & is.null(gridCells)) {
+
+    randomGridCells <- allGridCells %>%
       ungroup() %>%
       sample_n(size = sampleAlt$locations )
+
+    selectedGridCells <- randomGridCells
 
   }
 
 
     staggerLength <- rep(0:(sampleAlt$resampleTime -1), length.out = nrow(sub))
 
-    randomGridCells <- randomGridCells %>%
+    selectedGridCells <- selectedGridCells %>%
       mutate(staggerInt = row_number())
 
-    randomGridCells <- randomGridCells %>%
+    selectedGridCells <- selectedGridCells %>%
       ungroup() %>%
       mutate(stagger = staggerLength[staggerInt]) %>%
     left_join(stagger, by = c("stagger" = "stagger")) %>%
@@ -166,11 +168,10 @@ sampleNorm2 <- function(map,
 
 
     sub <- sub %>%
-      dplyr::inner_join(randomGridCells,
+      dplyr::inner_join(selectedGridCells,
                         by = c("ssbid" = "ssbid",
                                "year" = "year"))
 
-  }
 
   sub <- sub %>%
     dplyr::mutate(amount = rnorm(nrow(.), sampleErr, get(column)))
@@ -178,4 +179,3 @@ sampleNorm2 <- function(map,
   return(sub)
 
 }
-

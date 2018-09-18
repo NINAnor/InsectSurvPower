@@ -140,5 +140,20 @@ createOccNorm <- function(map,
   combined <- combined %>%
     mutate(KOMMUNENUMMER = as.integer(KOMMUNENUMMER))
 
-  return(combined)
+  out <- list()
+  out$map <- combined
+
+  out$params <- as.list(match.call())
+
+  class(out) <- c("surveyHat", "list")
+
+  return(out)
 }
+
+
+#' @export
+print.surveyHat <- function(surveyHat) {
+  print(surveyHat$map)
+}
+
+

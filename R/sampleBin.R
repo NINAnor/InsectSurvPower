@@ -1,9 +1,17 @@
 #' sampleBin
 #'
 #'
-#' @param column Column to draw samples from.
-#' @param gridCells Vector of which map grid cells to draw from, for repeated samples from the same grid cells. Incompatible with n.
-#' @param nSites Integer, number of new random grids to sample. Imcompatible with rows.
+#' @param map a surveyHat object (data frame containing ssbids fylke and kommune colums, response colum and potential other grouping columns)
+#' @param nYears the number of years of the survey. Note that you need at least two years to have one revisit. Defaults to the timespan of the map.
+#' @param yearlyCapacity the total yearly survey capacity.
+#' @param resampleTime how many years between revisits? Defaults to 1 for yearly revisits.
+#' @param resampleWithin within which region (or other category) should the revisits be distributed.
+#' Ensures even sampling schemes in all regions. Note that all regions may get fewer locations if the yearlyCapacity and number of regions don't match up.
+#' @param column Column to draw samples from. Defaults to "norm" for normally distributed variables.
+#' @param subFylke optionally limit the draws to set of fylkes. Character vector.
+#' @param subKommune optionally limit the drawn cells to a set of kommunes. Character vector.
+#' @param gridCells Vector of which map grid cells to draw from, for repeated samples from the same grid cells. Overrides arguments associated
+#' with random draws of map cells.
 #' @param nObs Number of observations to draw. Can be a single integer or a vector of integers. This will be coerced to integer(s).
 #'
 #'
@@ -16,36 +24,153 @@
 #' @import sf
 #' @import dplyr
 
-sampleBin <- function(map,
-                      column,
-                      subFylke = NULL,
-                      subKommune = NULL,
-                      gridCells = NULL,
-                      nSites = NULL,
-                      nObs = 1){
 
-  if(!is.null(gridCells) & !is.null(n)) stop("Don't specify gridCells AND n at the same time.")
-  nObs <- as.integer(nObs)
+sampleBin <- function(map,
+                       nYears = NULL,
+                       yearlyCapacity = NULL,
+                       resampleTime = 1,
+                       resampleWithin = "none",
+                       column = "norm",
+                       subFylke = NULL,
+                       subKommune = NULL,
+                       gridCells = NULL,
+                       nObs = 1){
+
+  map <- map$map
+
+  resampleWithin <- match.arg(resampleWithin, c(names(map), "none"))
+
+  if(is.null(nYears)){
+    nYears <- max(map$year)
+  }
+
+  reSamp <- resampleTime
+  sampleAlt <- sampleAlternatives(maxTime = nYears, maxCapacity = yearlyCapacity, stepsCapacity = yearlyCapacity)
+  if(!(resampleTime %in% sampleAlt$resampleTime)){
+    stop(paste0("ResamplingTime needs to be one of ",
+                paste(sampleAlt$resampleTime, collapse = ", "),
+                " for a time period of ",
+                nYears,
+                " and yearly capacity of ",
+                yearlyCapacity))
+  }
+  sampleAlt <- sampleAlt %>%
+    filter(resampleTime == reSamp) %>%
+    transmute_all(as.character) %>%
+    transmute_all(as.integer)
+
+
+  if(!is.null(gridCells) & resampleWithin != "none") stop("Don't specify gridCells AND resampleWithin at the same time.")
+  if(!is.null(gridCells) & !is.null(subFylke)) stop("Don't specify gridCells AND subFylke at the same time.")
+  if(!is.null(gridCells) & !is.null(subKommune)) stop("Don't specify gridCells AND subKommune at the same time.")
+
+  yearsInMap <- map %>%
+    sf::st_set_geometry(NULL) %>%
+    select(year) %>%
+    distinct() %>%
+    nrow
+
+  if(yearsInMap < nYears) stop(paste("surveyHat input (map) doesn't contain enough years to sample", nYears, "years."))
+
 
   sub <- map
 
-  if(!is.null(subFylke)){
+  if(!is.null(subFylke) & is.null(gridCells)){
     sub <- sub %>%
       dplyr::filter(fylke %in% subFylke)
   }
 
-  if(!is.null(subKommune)){
+  if(!is.null(subKommune) & is.null(gridCells)){
     sub <- sub %>%
       dplyr::filter(kommune %in% subKommune)
   }
 
   if(!is.null(gridCells)){
     sub <- sub %>% filter(ssbid %in% gridCells)
-  } else {
-    randomGridCells <- sample(unique(sub$ssbid), nSites, replace = F)
-    sub <- sub %>%
-      dplyr::filter(ssbid %in% randomGridCells)
   }
+
+  stagger <- sapply(rep(0:(sampleAlt$resampleTime -1)),  FUN = function(x) (seq(from = min(sub$year) + x,
+                                                                                to = 2 * sampleAlt$timespan,
+                                                                                by = sampleAlt$resampleTime)))
+
+  colnames(stagger) <- rep(0:(sampleAlt$resampleTime -1))
+
+  stagger <- as_tibble(stagger) %>%
+    gather(key = stagger,
+           value = "selectYear") %>%
+    transmute_all(as.integer) %>%
+    filter(selectYear <= sampleAlt$timespan)
+
+
+  allGridCells <- sub %>%
+    sf::st_set_geometry(NULL) %>%
+    group_by(ssbid) %>%
+    slice(1)
+
+  selectedGridCells <- allGridCells
+
+  if(resampleWithin != "none" & is.null(gridCells)){
+
+    noCells <- sub %>%
+      sf::st_set_geometry(NULL) %>%
+      select(resampleWithin) %>%
+      distinct() %>%
+      nrow()
+
+    table <- allGridCells %>%
+      group_by(get(resampleWithin)) %>%
+      tally() %>%
+      select(n)
+
+    if(as.integer(ceiling(sampleAlt$locations / noCells)) > min(table)){
+
+      stop(paste0("Not enough grid cells to resample within ", resampleWithin,
+                  " with this sampling regime."))
+    }
+
+    randomGridCells <- allGridCells %>%
+      group_by(get(resampleWithin)) %>%
+      sample_n(size = as.integer(ceiling(sampleAlt$locations / noCells)))
+
+    #remove extra cells
+    toRemove <- nrow(randomGridCells) - sampleAlt$locations
+    removeFrom <- randomGridCells %>%
+      slice(n()) %>%
+      ungroup() %>%
+      sample_n(size = toRemove)
+
+    selectedGridCells <- randomGridCells %>%
+      filter(!(ssbid %in% removeFrom$ssbid))
+  }
+
+  if(resampleWithin == "none" & is.null(gridCells)) {
+
+    randomGridCells <- allGridCells %>%
+      ungroup() %>%
+      sample_n(size = sampleAlt$locations )
+
+    selectedGridCells <- randomGridCells
+
+  }
+
+
+  staggerLength <- rep(0:(sampleAlt$resampleTime -1), length.out = nrow(sub))
+
+  selectedGridCells <- selectedGridCells %>%
+    mutate(staggerInt = row_number())
+
+  selectedGridCells <- selectedGridCells %>%
+    ungroup() %>%
+    mutate(stagger = staggerLength[staggerInt]) %>%
+    left_join(stagger, by = c("stagger" = "stagger")) %>%
+    select(ssbid,
+           year = selectYear)
+
+
+  sub <- sub %>%
+    dplyr::inner_join(selectedGridCells,
+                      by = c("ssbid" = "ssbid",
+                             "year" = "year"))
 
 
   sub <- sub %>%
@@ -55,3 +180,44 @@ sampleBin <- function(map,
   return(sub)
 
 }
+
+#
+# sampleBin <- function(map,
+#                       column,
+#                       subFylke = NULL,
+#                       subKommune = NULL,
+#                       gridCells = NULL,
+#                       nSites = NULL,
+#                       nObs = 1){
+#
+#   if(!is.null(gridCells) & !is.null(n)) stop("Don't specify gridCells AND n at the same time.")
+#   nObs <- as.integer(nObs)
+#
+#   sub <- map
+#
+#   if(!is.null(subFylke)){
+#     sub <- sub %>%
+#       dplyr::filter(fylke %in% subFylke)
+#   }
+#
+#   if(!is.null(subKommune)){
+#     sub <- sub %>%
+#       dplyr::filter(kommune %in% subKommune)
+#   }
+#
+#   if(!is.null(gridCells)){
+#     sub <- sub %>% filter(ssbid %in% gridCells)
+#   } else {
+#     randomGridCells <- sample(unique(sub$ssbid), nSites, replace = F)
+#     sub <- sub %>%
+#       dplyr::filter(ssbid %in% randomGridCells)
+#   }
+#
+#
+#   sub <- sub %>%
+#     dplyr::mutate(nVisits = nObs,
+#                   nFound = rbinom(nrow(.), nObs, get(column)))
+#
+#   return(sub)
+#
+# }

@@ -1,10 +1,10 @@
-Package: InsectSurvPower
+Package: SurveyPower
 Type: Package
 Title: Functions for calculating power of survey design.
 Version: 0.1.2
 Author: person("Jens", "Åström", email = "jens.astrom@nina.no",
   role = c("aut", "cre"))
-Maintainer: The package maintainer <yourself@somewhere.net>
+Maintainer: The package maintainer <jens.astrom@nina.no>
 Description: This is a package for internal use in NINA. 
   It contains functions and scripts to calculate power of survey design through simulations.
   It is mainly intended to be used in the development of an insect survey scheme in Norway.
