@@ -22,7 +22,7 @@
 #'
 #' }
 #' @import sf
-#' @import dplyr
+#' @import tidyverse
 
 
 sampleBin <- function(map,

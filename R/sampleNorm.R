@@ -21,9 +21,7 @@
 #'
 #' }
 #' @import sf
-#' @import dplyr
-
-
+#' @import tidyverse
 
 sampleNorm <- function(map,
                         nYears = NULL,
@@ -96,7 +94,7 @@ sampleNorm <- function(map,
     colnames(stagger) <- rep(0:(sampleAlt$resampleTime -1))
 
     stagger <- as_tibble(stagger) %>%
-      gather(key = stagger,
+      tidyr::gather(key = stagger,
              value = "selectYear") %>%
       transmute_all(as.integer) %>%
       filter(selectYear <= sampleAlt$timespan)

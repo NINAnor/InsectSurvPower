@@ -30,6 +30,7 @@ palette(ninaPalette())
 
 ```{r, include = F}
 con <- dbConnect(Postgres(), host = "ninpgsql03.nina.no", dbname = "gisdata", user = "postgjest", password = "gjestpost")
+data(map10km)
 ```
 
 

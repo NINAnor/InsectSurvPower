@@ -1,7 +1,7 @@
 Package: SurveyPower
 Type: Package
 Title: Functions for calculating power of survey design.
-Version: 0.1.2
+Version: 0.1.3
 Author: person("Jens", "Åström", email = "jens.astrom@nina.no",
   role = c("aut", "cre"))
 Maintainer: The package maintainer <jens.astrom@nina.no>

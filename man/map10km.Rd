@@ -3,7 +3,7 @@
 \docType{data}
 \name{map10km}
 \alias{map10km}
-\title{Map of SSB-grids with AR5 artype on a 10km scale grid}
+\title{map10km}
 \format{Simple feature collection with 4057 features and 8 fields}
 \source{
 \code{map10km <- getSSBGrid(conn = con, scale = "10km")}
@@ -12,6 +12,7 @@
 map10km
 }
 \description{
+Map of SSB-grids with AR5 artype on a 10km scale grid.
 This could as easily be gotten from the function below, but is stored here for speed.
 }
 \keyword{datasets}

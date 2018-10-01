@@ -17,12 +17,14 @@
 #' }
 #' @import sf
 #' @import tidyverse
+#' @import lme4
+
 
 ## Default är att köra samma modell, med kommuner och fylken som random effect, och jämföra varianser etc med parametrarna för bildandet
 ## av surveyHat.
 ## Alternativa modeller kan vara fylke och eller kommun som fixed effekt, och jämföra estimaten och osäkerhetena med de realiserade värdena i surveyHat
 
-##Need to set the same default for ARTYPE always.
+
 
 estimatePars <- function(map = NULL,
                          sampleFun = c("sampleNorm", "sampleBin", "samplePois"),
@@ -31,8 +33,14 @@ estimatePars <- function(map = NULL,
                          nIter = 1){
 
   map$map$ARTYPE <- as.factor(map$map$ARTYPE)
-  contrasts(map$map$ARTYPE)
-  map$map$ARTYPE <- relevel(map$map$ARTYPE, "Skog")  ##This is a temporary hack to set the level to something that most often will be included
+  #contrasts(map$map$ARTYPE)
+  map$map$ARTYPE <- relevel(map$map$ARTYPE, "Skog")  ##This is to set the reference level to something that most often will be included
+
+  map$map$fylke <- as.factor(map$map$fylke)
+  map$map$fylke <- relevel(map$map$fylke, "Akershus")
+
+  map$map$kommune <- as.factor(map$map$kommune)
+  map$map$kommune <- relevel(map$map$kommune, "Aurskog-Høland")
 
   sampleFun <- match.arg(sampleFun, c("sampleNorm", "sampleBin", "samplePois"))
 
@@ -42,8 +50,10 @@ estimatePars <- function(map = NULL,
 
   draw <- do.call(sampleFun, sampleParsRun)
 
+  intercept <- rep(map$params$intercept, nrow(draw))
+
   if(model == "normalFull"){
-    modelFun = lmer
+    modelFun = lme4::lmer
     formula = as.formula(norm ~ 1 + year * ARTYPE + (year | fylke) + (year | kommune))
   }
 
@@ -90,15 +100,15 @@ estimatePars <- function(map = NULL,
                   "year:ARTYPESkog" = as.numeric(paste0(as.character(map$params$artypeTrend$Skog), collapse = "")))
 
 
-  estHat <- fixef(modelRes)
-  estSD <- sqrt(diag(vcov(modelRes)))
+  estHat <- lme4::fixef(modelRes)
+  estSD <- sqrt(Matrix::diag(lme4::vcov.merMod(modelRes)))
   names(estSD) <- names(estHat)
 
-  sortEstHat <- rep(0, length = length(fullParams))
+  sortEstHat <- rep(NA, length = length(fullParams))
   names(sortEstHat) <- names(fullParams)
   sortEstHat[match(names(estHat), names(sortEstHat))] <- estHat
 
-  sortEstSD <- rep(0, length = length(fullParams))
+  sortEstSD <- rep(NA, length = length(fullParams))
   names(sortEstSD) <- names(fullParams)
   sortEstSD[match(names(estSD), names(sortEstSD))] <- estSD
 
@@ -116,16 +126,16 @@ estimatePars <- function(map = NULL,
 
       modelRes <- do.call(modelFun, modelPars)
 
-      estHat <- fixef(modelRes)
-      estSD <- sqrt(diag(vcov(modelRes)))
+      estHat <- lme4::fixef(modelRes)
+      estSD <- sqrt(Matrix::diag(lme4::vcov.merMod(modelRes)))
       names(estSD) <- names(estHat)
 
 
-      sortEstHat <- rep(0, length = length(fullParams))
+      sortEstHat <- rep(NA, length = length(fullParams))
       names(sortEstHat) <- names(fullParams)
       sortEstHat[match(names(estHat), names(sortEstHat))] <- estHat
 
-      sortEstSD <- rep(0, length = length(fullParams))
+      sortEstSD <- rep(NA, length = length(fullParams))
       names(sortEstSD) <- names(fullParams)
       sortEstSD[match(names(estSD), names(sortEstSD))] <- estSD
 
@@ -136,14 +146,11 @@ estimatePars <- function(map = NULL,
 
     }
 
-    return(compList)
+
 
   }
 
+  class(compList) <- c("estimatePar", "List")
 
+  return(compList)
 }
-
-
-#tt <- estimatePars(map = normTrend, sampleFun = "sampleNorm", nIter = 10)
-
-

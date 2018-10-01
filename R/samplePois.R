@@ -21,8 +21,7 @@
 #'
 #' }
 #' @import sf
-#' @import dplyr
-
+#' @import tidyverse
 
 samplePois <- function(map,
                        nYears = NULL,

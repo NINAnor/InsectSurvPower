@@ -10,7 +10,6 @@
 #' @param sigmaFylke Standard deviance of kommunes.
 #' @param sigmaFylke Standard deviance of grids.
 #'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -18,6 +17,7 @@
 #' }
 #' @import sf
 #' @import tidyverse
+#' @export
 
 
 createOccNorm <- function(map,

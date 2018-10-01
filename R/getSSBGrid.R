@@ -33,7 +33,7 @@ a.\"ARTYPE\"
   --ORDER BY s.ssbid
   --LIMIT 10")
 
-  out <- st_read_db(conn = conn, query = query, geom_column = "geom") %>%
+  out <- st_read(conn = conn, query = query, geom_column = "geom") %>%
     transform(ARTYPE = recode(ARTYPE,
                               `11` = "Bebygd",
                               `12` = "Samferdsel",
