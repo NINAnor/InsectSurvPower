@@ -22,47 +22,57 @@
 
 
 createOccPois <- function(map,
-                          intercept = 0.5,
+                          intercept = 22,
                           formula = ~ NULL,
                           sigmaFylke = 0.1,
                           sigmaKommune = 0.1,
                           sigmaGrid = 0,
                           sigmaFylkeTrend = 0,
                           sigmaKommuneTrend = 0,
-                          artypeEff = c("Bebygd" = 0,
-                                        "Samferdsel" = 0,
-                                        "Fulldyrka jord" = 0,
-                                        "Overflatedyrka jord" = 0,
-                                        "Innmarksbeite" = 0,
-                                        "Skog" = 0,
-                                        "Åpen fastmark" = 0,
-                                        "Myr" = 0,
-                                        "Isbre" = 0,
-                                        "Ferskvann" = 0,
-                                        "Hav" = 0,
-                                        "Ikke kartlagt" = 0
+                          artypeEff = c("Bebygd" = 1,
+                                        "Samferdsel" = 1,
+                                        "Fulldyrka jord" = 1,
+                                        "Overflatedyrka jord" = 1,
+                                        "Innmarksbeite" = 1,
+                                        "Skog" = 1,
+                                        "Åpen fastmark" = 1,
+                                        "Myr" = 1,
+                                        "Isbre" = 1,
+                                        "Ferskvann" = 1,
+                                        "Hav" = 1,
+                                        "Ikke kartlagt" = 1
                           ),
-                          artypeTrend = c("Bebygd" = 0,
-                                          "Samferdsel" = 0,
-                                          "Fulldyrka jord" = 0,
-                                          "Overflatedyrka jord" = 0,
-                                          "Innmarksbeite" = 0,
-                                          "Skog" = 0,
-                                          "Åpen fastmark" = 0,
-                                          "Myr" = 0,
-                                          "Isbre" = 0,
-                                          "Ferskvann" = 0,
-                                          "Hav" = 0,
-                                          "Ikke kartlagt" = 0
+                          artypeTrend = c("Bebygd" = 1,
+                                          "Samferdsel" = 1,
+                                          "Fulldyrka jord" = 1,
+                                          "Overflatedyrka jord" = 1,
+                                          "Innmarksbeite" = 1,
+                                          "Skog" = 1,
+                                          "Åpen fastmark" = 1,
+                                          "Myr" = 1,
+                                          "Isbre" = 1,
+                                          "Ferskvann" = 1,
+                                          "Hav" = 1,
+                                          "Ikke kartlagt" = 1
                           ),
                           nYears = 5,
-                          interceptTrend = -0.05,
+                          interceptTrend = 0.95,
                           sdInterceptTrend = 0,
                           sortFylke = T,
                           sortKommune = T,
                           sortGrid = T){
 
 
+  intercept <- log(intercept)
+  #sigmaKommune <- log(sigmaKommune)
+  #sigmaFylke <- log(sigmaFylke)
+  #sigmaGrid <- log(sigmaGrid)
+  #sigmaFylkeTrend <- log(sigmaFylkeTrend)
+  #sigmaKommuneTrend <- log(sigmaKommuneTrend)
+  interceptTrend <- log(interceptTrend)
+  #sdInterceptTrend <- log(sdInterceptTrend)
+  artypeEff <- log(artypeEff)
+  artypeTrend <-log(artypeTrend)
 
   #fylkeEff
   .fylkeEff <- dplyr::tibble(FYLKESNUMMER = unique(map$FYLKESNUMMER))
@@ -118,14 +128,14 @@ createOccPois <- function(map,
   #sum the effects
   out <- map %>%
     transform(year = 1,
-              lambda = intercept + artypeEff + fylkeEff + kommuneEff + gridEff)
+              lambda = exp(intercept + artypeEff + fylkeEff + kommuneEff + gridEff))
 
   if(nYears > 1){
     increment <- list()
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                  lambda = intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff
+                  lambda = exp(intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)
         )
 
     }
@@ -142,5 +152,14 @@ createOccPois <- function(map,
   combined <- combined %>%
     mutate(KOMMUNENUMMER = as.integer(KOMMUNENUMMER))
 
-  return(combined)
+  out <- list()
+  out$map <- combined
+
+  out$params <- as.list(match.call())
+
+  class(out) <- c("surveyHat", "list")
+
+  return(out)
+
+
 }

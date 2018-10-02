@@ -28,11 +28,10 @@ samplePois <- function(map,
                        yearlyCapacity = NULL,
                        resampleTime = 1,
                        resampleWithin = "none",
-                       column = "norm",
+                       column = "lambda",
                        subFylke = NULL,
                        subKommune = NULL,
-                       gridCells = NULL,
-                       sampleErr = 0){
+                       gridCells = NULL){
 
   map <- map$map
 
@@ -94,7 +93,7 @@ samplePois <- function(map,
   colnames(stagger) <- rep(0:(sampleAlt$resampleTime -1))
 
   stagger <- as_tibble(stagger) %>%
-    gather(key = stagger,
+    tidyr::gather(key = stagger,
            value = "selectYear") %>%
     transmute_all(as.integer) %>%
     filter(selectYear <= sampleAlt$timespan)
@@ -177,41 +176,3 @@ samplePois <- function(map,
   return(sub)
 
 }
-
-#
-# samplePois <- function(map,
-#                        column,
-#                        subFylke = NULL,
-#                        subKommune = NULL,
-#                        gridCells = NULL,
-#                        nSites = NULL){
-#
-#   if(!is.null(gridCells) & !is.null(nSites)) stop("Don't specify gridCells AND n at the same time.")
-#
-#   sub <- map
-#
-#   if(!is.null(subFylke)){
-#     sub <- sub %>%
-#       dplyr::filter(fylke %in% subFylke)
-#   }
-#
-#   if(!is.null(subKommune)){
-#     sub <- sub %>%
-#       dplyr::filter(kommune %in% subKommune)
-#   }
-#
-#   if(!is.null(gridCells)){
-#     sub <- sub %>% filter(ssbid %in% gridCells)
-#   } else {
-#     randomGridCells <- sample(unique(sub$ssbid), nSites, replace = F)
-#     sub <- sub %>%
-#       dplyr::filter(ssbid %in% randomGridCells)
-#   }
-#
-#
-#   sub <- sub %>%
-#     dplyr::mutate(nCount = rpois(nrow(.), get(column)))
-#
-#   return(sub)
-#
-# }

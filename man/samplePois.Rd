@@ -5,8 +5,8 @@
 \title{samplePois}
 \usage{
 samplePois(map, nYears = NULL, yearlyCapacity = NULL, resampleTime = 1,
-  resampleWithin = "none", column = "norm", subFylke = NULL,
-  subKommune = NULL, gridCells = NULL, sampleErr = 0)
+  resampleWithin = "none", column = "lambda", subFylke = NULL,
+  subKommune = NULL, gridCells = NULL)
 }
 \arguments{
 \item{map}{a surveyHat object (data frame containing ssbids fylke and kommune colums, response colum and potential other grouping columns)}

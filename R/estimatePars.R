@@ -55,12 +55,19 @@ estimatePars <- function(map = NULL,
   if(model == "normalFull"){
     modelFun = lme4::lmer
     formula = as.formula(norm ~ 1 + year * ARTYPE + (year | fylke) + (year | kommune))
-  }
-
 
   modelPars <- list("data" = sf::st_set_geometry(draw, NULL),
                      "formula" = formula)
+  }
 
+  if(model == "poissonFull"){
+    modelFun = lme4::glmer
+    formula = as.formula(nCount ~ 1 + year * ARTYPE + (year | fylke) + (year | kommune))
+
+    modelPars <- list("data" = sf::st_set_geometry(draw, NULL),
+                      "formula" = formula,
+                      "family" = poisson)
+  }
 
   modelRes <- do.call(modelFun, modelPars)
   #Something funny about how this gets printed when running it through do.call. Maybe doesn't matter
@@ -121,8 +128,23 @@ estimatePars <- function(map = NULL,
   if(nIter > 1){
     for(i in 2:nIter){
       draw <- do.call(sampleFun, sampleParsRun)
-      modelPars <- list("data" = sf::st_set_geometry(draw, NULL),
-                        "formula" = formula)
+
+      if(model == "normalFull"){
+        modelFun = lme4::lmer
+        formula = as.formula(norm ~ 1 + year * ARTYPE + (year | fylke) + (year | kommune))
+
+        modelPars <- list("data" = sf::st_set_geometry(draw, NULL),
+                          "formula" = formula)
+      }
+
+      if(model == "poissonFull"){
+        modelFun = lme4::glmer
+        formula = as.formula(nCount ~ 1 + year * ARTYPE + (year | fylke) + (year | kommune))
+
+        modelPars <- list("data" = sf::st_set_geometry(draw, NULL),
+                          "formula" = formula,
+                          "family" = poisson)
+      }
 
       modelRes <- do.call(modelFun, modelPars)
 
@@ -149,6 +171,13 @@ estimatePars <- function(map = NULL,
 
 
   }
+
+
+  if(model == "poissonFull"){
+    compList$estHat <- exp(compList$estHat)
+    compList$lower <- exp(compList$lower)
+    compList$upper <- exp(compList$upper)
+    }
 
   class(compList) <- c("estimatePar", "List")
 
