@@ -171,7 +171,7 @@ samplePois <- function(map,
 
 
   sub <- sub %>%
-    dplyr::mutate(nCount = rpois(nrow(.), get(column)))
+    dplyr::mutate(nCount = rpois(n = nrow(.), lambda = get(column)))
 
   return(sub)
 

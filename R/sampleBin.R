@@ -175,7 +175,7 @@ sampleBin <- function(map,
 
   sub <- sub %>%
     dplyr::mutate(nVisits = nObs,
-                  nFound = rbinom(nrow(.), nObs, get(column)))
+                  nFound = rbinom(n = nrow(.), size = nObs, prob = get(column)))
 
   return(sub)
 

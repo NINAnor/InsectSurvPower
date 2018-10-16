@@ -172,7 +172,7 @@ sampleNorm <- function(map,
 
 
   sub <- sub %>%
-    dplyr::mutate(amount = rnorm(nrow(.), sampleErr, get(column)))
+    dplyr::mutate(amount = rnorm(n = nrow(.), mean = get(column), sd = sampleErr))
 
   return(sub)
 
