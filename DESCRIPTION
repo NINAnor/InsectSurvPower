@@ -15,5 +15,5 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
-Imports: dplyr
+Imports: tidyverse, ggplot2
 

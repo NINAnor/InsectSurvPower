@@ -549,4 +549,8 @@ summary(mod1)
 
 ```
 
+```{r}
+postgresConnect()
+map1km <- getSSBGrid(scale = "1km")
+```
 

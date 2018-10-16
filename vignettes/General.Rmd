@@ -1,0 +1,556 @@
+---
+title: "General features of sampling design"
+author: "Jens Åström"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::pdf_document:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  tidy = T
+)
+```
+
+```{r, include = F}
+require(tidyverse)
+require(sf)
+#require(ggplot2)
+require(SurveyPower)
+```
+
+
+Replikering og kilder til variasjon
+============================
+
+Arealrepresentativitet – rutenettverk kontra habitatkartlegging
+=====================================
+Generelle ting, men også eksempler på tilfeldige rutevalg. Eksempelkart på lands, region og lokal nivå. Utfordringer ved automatiske valg. Mikromiljøer, etc.
+
+Antall habitater/regioner/forklaringsvariabler å estimere effekt av
+============================
+
+
+Locations and number of visits
+===============
+Variasjon mellom plasser, mellom år innen plasser, størrelser på nedganger og variasjon.
+
+In a survey design for time series data, you typically pick a number of sites that you revisit a number of times. Revisiting is needed to identify time trends, and the weaker the time trend, the more years have to pass before you can detect a difference. Figure \ref{revisitPlot} shows a hypothetical example of 5 sites that differ in their overall values, but follow the same time trend. In addition, there is a little bit of random variation for each sample. Since they follow the same trend, you wouldn't have to visit more than one, strictly speaking. In practice however, they will vary somewhat in their time trends, so you would still want to sample a set of sites to correctly identify the underlying common trend. If you like to estimate the overall abundance level, you also would want to sample several sites to account for the variation in baseline levels for the different sites.
+
+
+```{r}
+set.seed(1234)
+
+test5yearsTrend <- createOccNorm(map10km, 
+                              intercept = 10,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.2,
+                              sigmaSurvey = 0.01,
+                              nYears = 5,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+           
+
+```
+
+```{r revisitPlot, warnings = 'hide' ,fig.cap = "Hypothetical time trends for 4 sites (ssbid grid cells) that follow the same time trend but have diffent overall levels. \\label{revisitPlot}"}
+test5yearsTrend$map %>% 
+  filter(ssbid %in% sample(map10km$ssbid, 5)) %>% 
+    select(ssbid, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ssbid), 
+                stat = "summary", fun.y = "mean", lwd =2) + 
+  ylab("Abundance")
+
+```
+
+But the locations might not follow the same time trend so closely, and in reality they will always differ to some degree. If the locations have varying trends, as in figure \ref{spreadPlot}, it becomes harder to identify a potential underlying, common trend. In this case, we need to visit more sites to be able to identify the underlying trend.
+
+
+```{r}
+set.seed(1234)
+
+varying5yearsTrend <- createOccNorm(map10km, 
+                              intercept = 10,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.2,
+                              sigmaSurvey = 0.01,
+                              nYears = 5,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.05,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+           
+
+```
+
+
+
+```{r spreadPlot, echo = F, warnings = 'hide', fig.cap = "Hypothetical time trends for 4 sites (ssb grid cells) that follow the same underlying time trend but have diffent overall levels, and also vary in individual time trends. \\label{spreadPlot}"}
+varying5yearsTrend$map %>% 
+  filter(ssbid %in% sample(map10km$ssbid, 5)) %>% 
+    select(ssbid, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ssbid),
+                stat = "summary", fun.y = "mean",lwd =2) + 
+  ylab("Abundance")
+
+```
+
+Also, individual samples generally vary a bit more than this, so that the time trends might not look so straight (figure \ref{sigmaSpreadPlot}). In these cases, we need to sample each location several times to accurately estimate its time trend. However, as we will see in the next session, this comes with certain trade-offs. 
+
+```{r}
+set.seed(1234)
+
+sigmaVarying5yearsTrend <- createOccNorm(map10km, 
+                              intercept = 10,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.2,
+                              sigmaSurvey = 0.1,
+                              nYears = 5,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.05,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+           
+
+```
+```{r sigmaSpreadPlot, echo = F, warnings = 'hide', fig.cap = "Hypothetical time trends for 4 sites (ssb grid cells) that follow the same underlying time trend but have diffent overall levels, and also vary in individual time trends and have vary around their individual time trends. \\label{sigmaSpreadPlot}"}
+sigmaVarying10yearsTrend$map %>% 
+  filter(ssbid %in% sample(map10km$ssbid, 5)) %>% 
+    select(ssbid, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ssbid),
+               stat = "summary", fun.y = "mean", lwd =2) + 
+  ylab("Abundance")
+
+```
+
+
+
+
+\clearpage
+
+Staggered surveying and variation in time and space
+===========================================
+A typical survey program will have a limited yearly budget or work capacity that determine how many sites or samples that can be processed. This means you end up with a yearly capacity of sites to cover. But this yearly capacity can put to different uses. Should we for example revisit each site each year, or should we alternate the surveys between sites and thereby span over a wider range of sites? We could for example choose to revisit each location every third year, and span over 3 times as many sites. The penaly is that you only get a third of the replicates per site.
+
+The best choice here will depend on the relative size of the variation between sites and variation between survey occations. If sites are more or less the same, we don't have to visit many different sites to accurately represent the underlying population. On the other hand, if they are very differnt, a small subset of sites risks being unrepresentative of the underlying population. Conversely, if there is little between survey occation variation, every single visit will be representative of the overall level or trend for each location, and we require fewer samples per site. But when between-occation variation is higher, any visits will be influenced by random fluctuations and we need many visits per site to accurately capture its mean level or trend. 
+
+This means we end up with a trade-off between the number of visits per site and the number of sites to visit, given that we can only visit so many sites each year. Figures \ref{onePlot}, \ref{twoPlot}, \ref{threePlot}, and \ref{sixPlot} shows the various ways we could allocate a yearly survey capacity of 6 locations a year during 6 years. For simplicity, we keep the number of times each location is visited the same for all locations. In other words, we limit our explorations to cases that generates balanced data sets.  
+
+```{r onePlot, echo = F, fig.cap = "6 locations visited each year. 6 samples per location for a total of 36 samples. \\label{onePlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 6:1), "Year" = 1:6)) 
+dat$visit <- 1
+#dat
+
+
+ggplot(dat, aes(y = Location, x = Year, fill = visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = "darkolivegreen",
+                         guide = F)
+ 
+```
+
+
+
+```{r twoPlot, echo = F, fig.cap = "12 locations visited every other year. 3 samples per location for a total of 36 samples. \\label{twoPlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 12:1), "Year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$Year == 1] <- rep(c(0, 1), 6)
+dat$visit[dat$Year == 2] <- rep(c(1, 0), 6)
+dat$visit[dat$Year == 3] <- rep(c(0, 1), 6)
+dat$visit[dat$Year == 4] <- rep(c(1, 0), 6)
+dat$visit[dat$Year == 5] <- rep(c(0, 1), 6)
+dat$visit[dat$Year == 6] <- rep(c(1, 0), 6)
+
+
+
+ggplot(dat, aes(y = Location, x = Year, fill = visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "darkolivegreen"), 
+                         guide = F)
+
+```
+
+```{r threePlot, echo = F, fig.cap = "18 locations visited every third year. 2 samples per location for a total of 36 samples. \\label{threePlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 18:1), "Year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$Year == 1] <- rep(c(0, 0, 1), 6)
+dat$visit[dat$Year == 2] <- rep(c(0, 1, 0), 6)
+dat$visit[dat$Year == 3] <- rep(c(1, 0, 0), 6)
+dat$visit[dat$Year == 4] <- rep(c(0, 0, 1), 6)
+dat$visit[dat$Year == 5] <- rep(c(0, 1, 0), 6)
+dat$visit[dat$Year == 6] <- rep(c(1, 0, 0), 6)
+
+
+
+ggplot(dat, aes(y=Location, x=Year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "darkolivegreen"), 
+                         guide = F) 
+```
+
+
+```{r sixPlot, echo = F, fig.cap = "36 locations visited once. 1 sample per location for a total of 36 samples. \\label{sixPlot}"}
+dat <- as.tibble(expand.grid("Location" = paste("Location ", 36:1), "Year" = 1:6)) 
+dat$visit <-0
+
+dat$visit[dat$Year == 1] <- rep(c(0, 0, 0, 0, 0, 1), 6)
+dat$visit[dat$Year == 2] <- rep(c(0, 0, 0, 0, 1, 0), 6)
+dat$visit[dat$Year == 3] <- rep(c(0, 0, 0, 1, 0, 0), 6)
+dat$visit[dat$Year == 4] <- rep(c(0, 0, 1, 0, 0, 0), 6)
+dat$visit[dat$Year == 5] <- rep(c(0, 1, 0, 0, 0, 0), 6)
+dat$visit[dat$Year == 6] <- rep(c(1, 0, 0, 0, 0, 0), 6)
+
+ggplot(dat, aes(y=Location, x=Year, fill=visit)) + 
+  geom_tile(colour="white", 
+            width=.9, height=.9) + theme_minimal() +
+    scale_fill_gradientn(colors = c("white", "darkolivegreen"), 
+                         guide = F) 
+```
+
+\clearpage
+
+As long as we keep to a balanced design, where we revisit each site the same number of thimes, there are some simple rules of how such survey schemes can be set up. 
+
+We can define these parameters: 
+$$
+\begin{aligned}
+Sampling~ capacity~ each~ year: a \\
+Total~ timespan~ of~ survey: T \\
+Resampling~ interval~ per~ locality: t \\
+Number~ of~ localities: l \\
+Total~ number~ of~ samples: s \\
+Replicates~ per~ location: r
+\end{aligned}
+$$
+
+The number of localities that we can survey is then $$l = t * a,$$ which can be maximised by maximising $t$ to $t = T$. The minimum timespan between revisits in a location is $$t = T / a,$$ which also minimizes the total number of locations. However, the number of samples per location $r$ is at the same time maximized as this follows $$r = T / t$$. The total number of samples simply is $$s = T * a.$$ Lastly, balanced survey schemes relies on the total survey length being evenly divisible by the yearly total survey capacity, i.e. as long as $T\bmod a=0$. 
+
+These relationships limits the number of possible survey schemes. The possible survey schemes can be calculated quite simply, but also generated by the function `sampleAlternatives`, where the created object has its own plot method for convenience. Figure \ref{resampPlot} show how the number of possible locations and replicates (visits) per location depend on the yearly survey capacity and the time lag between visits to each location. As the figure shows, you can survey a staggering amount of locations in 40 years, if you are willing drastically lower the number of revisits. The trade-off between the number of locations and the number of visits per location is pretty sharp, and it is difficult to achieve high numbers in both, even with a high yearly capacity.
+
+
+```{r resampPlot, fig.cap = "The relationship between number of surveyed locations and replicates per location for different survey staggering times and yearly survey capacities. \\label{resampPlot}"}
+testSampleAlt <- sampleAlternatives(maxTime = 40,  
+                        maxCapacity= 400, 
+                        stepsCapacity = 100)
+
+#class(testSampleAlt)
+     
+plot(testSampleAlt,
+     color = "resampleTime", 
+     allTicks = F)
+```
+
+For most programs, however, it would be unreasonably long to have to wait 40 years to evaluate possible time trends. Figures \ref{T9a3Plot} and \ref{T9a300Plot} show a more reasonable time span of 9 years, with low and high yearly capacities, respectively.
+
+
+```{r T9a3Plot, fig.cap = "Possible survey schemes with low yearly capacity over 9 years. Colors represent the total number of samples, and symbol types represent different yearly capacities. \\label{T9a3Plot}"}
+plot(sampleAlternatives(maxTime = 9,  maxCapacity= 3, stepsCapacity = 1), 
+     color = "totSamples")
+```
+
+```{r T12a300Plot, fig.cap = "Possible survey schemes with high yearly capacity over 12 years. Colors represent the total number of samples, and symbol types represent different yearly capacities.\\label{T9a300Plot}"}
+plot(sampleAlternatives(maxTime = 9,  maxCapacity= 300, stepsCapacity = 60), 
+     color = "totSamples",
+     allTicks = F)
+```
+
+For an active real world example, we can plot the situation for the bumblebee and butterfly survey. This survey is done each year in 18 locations for each of three regions, together comprising 54 locations. The survey has been active since 2009 and thus exemplifies the results of potential schemes in the year 2021. Today, we revisit the same locations each year, resulting in 18 locations per region. But if we where to revisit each site only every third year, we could visit 54 locations 4 times in the same time span. Or for all regions, instead of visiting 54 locations 12 times, we could visit 162 locations 3 times each, figure \ref{T12a54Plot}.
+
+```{r T12a18Plot, fig.cap = "Possible survey schemes with a the same yearly capacity as the bumblebee and butterfly survey. This survey is done each year in 18 locations for each of three regions, together comprising 54 locations. The different lines/symbols thus represent including 1, 2, or all three regions in an analysis. \\label{T12a54Plot}"}
+plot(sampleAlternatives(maxTime = 12,  maxCapacity= 54, stepsCapacity = 18), 
+     color = "resampleTime", 
+     allTicks = F)
+```
+
+The optimal strategy will vary depending on the various sources of variation. As mentioned above, a high yearly variability increases the need for multiple samples per location, while a high variability between sites increases the need to visit many sites. If we are interested in the absolute numbers in each region, and this varies by sites, we must visit more sites per region. If we are interested in the trends in each region, and these trends vary by site, we also need to visit more sites per region. It is not easy working out the optimal strategy, or calculate the statistical power of various survey schemes analytically. We need to simulate various situations and test out different strategies.  
+
+
+Consider the case when we have small inter-annual variation, but high variation between sites. If we sample 100 sites yearly and try to estimate the trend for different land use classes, we see there is some uncertainty in the estimates, due to the fact that each site differ 
+
+```{r}
+intra2Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 3,
+                              sigmaSurvey = 0.01,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 2,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+```
+
+```{r yearlyResamp, fig.cap = "Spread of time trends with yearly resampling of 100 sites. \\label{yearlyResamp}" }
+set.seed(1234)
+draws <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 1)
+
+
+draws %>% 
+    select(ssbid, ARTYPE, fylke, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+
+```{r 5yearResamp, fig.cap = "Spread of time trends with yearly resampling of 100 sites. \\label{5yearResamp}" }
+set.seed(1234)
+draws2 <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 5)
+
+
+draws2 %>% 
+    select(ssbid, ARTYPE, fylke,  norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+
+
+```{r}
+intra2Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.01,
+                              sigmaSurvey = 2,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.01,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+```
+
+```{r yearlyResamp, fig.cap = "Spread of time trends with yearly resampling of 100 sites. \\label{yearlyResamp}" }
+set.seed(1234)
+draws <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 1)
+
+
+draws %>% 
+    select(ssbid, ARTYPE, fylke, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+
+```{r 5yearResamp, fig.cap = "Spread of time trends with yearly resampling of 100 sites. \\label{5yearResamp}" }
+set.seed(1234)
+draws2 <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 5)
+
+
+draws2 %>% 
+    select(ssbid, ARTYPE, fylke,  norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+Why don't the two strategies differ more?
+
+
+```{r}
+intra_05Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.05,
+                              sigmaSurvey = 0.01,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+           
+
+intra_10Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 0.1,
+                              sigmaSurvey = 0.01,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+
+
+intra1Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 1,
+                              sigmaSurvey = 0.01,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+
+
+intra2Trend <- createOccNorm(map10km, 
+                              intercept = 40,
+                              sigmaFylke = 0, 
+                              sigmaKommune = 0, 
+                              sigmaGrid = 2,
+                              sigmaSurvey = 0.01,
+                              nYears = 20,
+                              interceptTrend = -0.05,
+                              sigmaFylkeTrend = 0,
+                              sigmaKommuneTrend = 0,
+                              sdInterceptTrend = 0.0,
+                              sortGrid = F, 
+                              sortFylke = F, 
+                              sortKommune = F)
+```
+
+```{r}
+intra2Trend$map %>% 
+    select(ssbid, ARTYPE, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ARTYPE),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+
+
+
+```{r}
+nIter = 20
+yearlyIntra05Est <- estimatePars(map = intra_05Trend,
+                                 samplePars = list(yearlyCapacity = 100,
+                                                   resampleTime = 1),
+                                 nIter = nIter)
+
+
+yearlyIntra10Est <- estimatePars(map = intra_10Trend,
+                                 samplePars = list(yearlyCapacity = 100,
+                                                   resampleTime = 1),
+                                 nIter = nIter)
+
+yearlyIntra1Est <- estimatePars(map = intra1Trend,
+                                 samplePars = list(yearlyCapacity = 100,
+                                                   resampleTime = 1),
+                                 nIter = nIter)
+
+yearlyIntra2Est <- estimatePars(map = intra2Trend,
+                                 samplePars = list(yearlyCapacity = 50,
+                                                   resampleTime = 1),
+                                 nIter = nIter)
+
+
+
+```
+
+```{r}
+draws <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 1)
+
+
+draws %>% 
+    select(ssbid, ARTYPE, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ARTYPE),
+                lwd =2) + 
+    ylab("Abundance")
+
+
+```
+
+```{r}
+draws2 <- sampleNorm(intra2Trend,
+                    yearlyCapacity = 20,
+                    resampleTime = 10)
+
+
+draws2 %>% 
+    select(ssbid, ARTYPE, norm, year) %>%
+  ggplot(.) +
+    geom_smooth(aes(x = year, y = norm, color = ARTYPE),
+                lwd =2) + 
+    ylab("Abundance")
+
+##?
+```
+
+
+```{r}
+compareEstPar(yearlyIntra05Est)
+
+compareEstPar(yearlyIntra2Est)
+
+
+```
+
+##Need to be able to test custom functions in estimatePars. Need a simpler case than year*ARTYPE?
+
+
+
+Overvåking av sjeldne og kryptiske arter
+==========================
+Konsekvenser av lav sannsynlighet for oppdagbarhet og tilstedeværelse.

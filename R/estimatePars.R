@@ -70,13 +70,6 @@ estimatePars <- function(map = NULL,
   }
 
   modelRes <- do.call(modelFun, modelPars)
-  #Something funny about how this gets printed when running it through do.call. Maybe doesn't matter
-  #hm <- lmer(modelPars$formula, data = modelPars$data)
-
-  #summary(modelRes)
-
-  #map$params
-
 
 
   fullParams <- c("(Intercept)" = as.numeric(paste0(as.character(map$params$intercept), collapse = "")),

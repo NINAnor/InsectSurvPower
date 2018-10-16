@@ -4,15 +4,15 @@
 \alias{createOccPois}
 \title{createOccPois}
 \usage{
-createOccPois(map, intercept = 0.5, formula = ~NULL, sigmaFylke = 0.1,
+createOccPois(map, intercept = 22, formula = ~NULL, sigmaFylke = 0.1,
   sigmaKommune = 0.1, sigmaGrid = 0, sigmaFylkeTrend = 0,
-  sigmaKommuneTrend = 0, artypeEff = c(Bebygd = 0, Samferdsel = 0,
-  `Fulldyrka jord` = 0, `Overflatedyrka jord` = 0, Innmarksbeite = 0, Skog = 0,
-  `Åpen fastmark` = 0, Myr = 0, Isbre = 0, Ferskvann = 0, Hav = 0, `Ikke
-  kartlagt` = 0), artypeTrend = c(Bebygd = 0, Samferdsel = 0, `Fulldyrka jord`
-  = 0, `Overflatedyrka jord` = 0, Innmarksbeite = 0, Skog = 0, `Åpen fastmark`
-  = 0, Myr = 0, Isbre = 0, Ferskvann = 0, Hav = 0, `Ikke kartlagt` = 0),
-  nYears = 5, interceptTrend = -0.05, sdInterceptTrend = 0,
+  sigmaKommuneTrend = 0, artypeEff = c(Bebygd = 1, Samferdsel = 1,
+  `Fulldyrka jord` = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog = 1,
+  `Åpen fastmark` = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1, `Ikke
+  kartlagt` = 1), artypeTrend = c(Bebygd = 1, Samferdsel = 1, `Fulldyrka jord`
+  = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog = 1, `Åpen fastmark`
+  = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1, `Ikke kartlagt` = 1),
+  nYears = 5, interceptTrend = 0.95, sdInterceptTrend = 0,
   sortFylke = T, sortKommune = T, sortGrid = T)
 }
 \arguments{

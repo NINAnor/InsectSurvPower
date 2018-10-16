@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 require(tidyverse)
 require(sf)
 #require(ggplot2)
-require(InsectSurvPower)
+require(SurveyPower)
 ```
 
 **Todo:**

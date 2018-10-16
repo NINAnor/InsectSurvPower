@@ -6,3 +6,5 @@
 #' @format Simple feature collection with 4057 features and 8 fields
 #' @source \code{map10km <- getSSBGrid(conn = con, scale = "10km")}
 "map10km"
+"map1km"
+"predWeights1km"

@@ -135,7 +135,7 @@ createOccPois <- function(map,
     for(i in 2:nYears){
       increment[[(i-1)]] <- map %>%
         transform(year = i,
-                  lambda = exp(intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)
+                  lambda = exp(intercept + rnorm(nrow(map), interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff)
         )
 
     }

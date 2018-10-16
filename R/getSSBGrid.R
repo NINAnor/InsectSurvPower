@@ -17,10 +17,10 @@
 
 getSSBGrid <- function(conn = con, scale = c("10km","5km", "1km", "500m")){
 
-  scale <- match.arg(scale)
+  scale <- match.arg(scale, c("10km","5km", "1km", "500m"))
   ssb <- paste0("ssb_data_utm33n.ssb_", scale)
 
-  query <- paste0("SELECT s.ssbid, s.xcoor lon, s.ycoor lat, s.geom,
+  query <- paste0("SELECT s.ssbid::varchar, s.xcoor lon, s.ycoor lat, s.geom,
 f.\"FYLKESNUMMER\", f.navn fylke, k.\"KOMMUNENUMMER\", k.navn kommune,
 a.\"ARTYPE\"
   FROM ", ssb," s,
@@ -33,7 +33,7 @@ a.\"ARTYPE\"
   --ORDER BY s.ssbid
   --LIMIT 10")
 
-  out <- st_read(conn = conn, query = query, geom_column = "geom") %>%
+  out <- st_read(dsn = conn, query = query, geom_column = "geom") %>%
     transform(ARTYPE = recode(ARTYPE,
                               `11` = "Bebygd",
                               `12` = "Samferdsel",
@@ -50,5 +50,6 @@ a.\"ARTYPE\"
     dplyr::as_tibble() %>%
     sf::st_as_sf()
 
-  return(out)
+   return(out)
+
 }

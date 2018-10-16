@@ -25,6 +25,7 @@ createOccNorm <- function(map,
                           sigmaFylke = 0.1,
                           sigmaKommune = 0.1,
                           sigmaGrid = 0,
+                          sigmaSurvey = 0,
                           sigmaFylkeTrend = 0,
                           sigmaKommuneTrend = 0,
                           artypeEff = c("Bebygd" = 0,
@@ -116,15 +117,17 @@ createOccNorm <- function(map,
   #sum the effects
   out <- map %>%
     transform(year = 1,
-              norm = intercept + artypeEff + fylkeEff + kommuneEff + gridEff)
+              norm = intercept + artypeEff + fylkeEff + kommuneEff + gridEff + rnorm(nrow(map), 0, sigmaSurvey))
 
   if(nYears > 1){
+    trends <- rnorm(nrow(map), interceptTrend, sdInterceptTrend)
+
     increment <- list()
-    for(i in 2:nYears){
-      increment[[(i-1)]] <- map %>%
-        transform(year = i,
-                  norm = intercept + rnorm(1, interceptTrend, sdInterceptTrend) * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff
-)
+    for(i in 2:nYears - 1){
+      increment[[i]] <- map %>%
+        transform(year = i + 1,
+                  norm = intercept + trends * i + artypeEff + artypeTrend * i + fylkeEff + fylkeTrend * i + kommuneEff + kommuneTrend * i + gridEff + rnorm(nrow(map), 0, sigmaSurvey)
+    )
 
     }
 

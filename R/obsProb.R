@@ -67,7 +67,8 @@ obsProb <- function(occProb,
       visitCost = visitCost,
       #probObserv = sum(reps) / length(reps),
       #std.error = sqrt((probObserv * (1 - probObserv)) / length(reps)),
-      obsProb = (1 - (1 - occProb)^locations) * (1 - (1 - detectProb)^visits),
+     #obsProb = (1 - (1 - occProb)^locations) * (1 - (1 - detectProb)^visits), #WRONG!
+     obsProb = 1 - (1 - occProb * (1 - (1 - detectProb)^visits))^locations,
       totCost = sum(locations * visits * visitCost)
     )
 
