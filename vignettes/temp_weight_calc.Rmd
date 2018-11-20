@@ -15,14 +15,9 @@ require(SurveyPower)
 data("predWeights1km")
 ```
 
-```{r}
-knitr::opts_chunk$set(eval = F)
-```
 
 
-
-
-```{r}
+```{r, eval = F}
 
 system.time(predOcc500Det1 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
@@ -41,7 +36,7 @@ load("predOcc500Det1.Rdata")
 ```
 
 
-```{r}
+```{r, eval = F}
 
 system.time(predOcc500Det0.8 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
@@ -58,36 +53,36 @@ save(predOcc500Det0.8, file = "predOcc500Det0.8.Rdata")
 ```{r}
 
 load(file = "predOcc500Det0.8.Rdata")
-plot(predOcc500Det0.8)
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.8)
 predOcc500Det0.8
 ```
 
 
-```{r}
+```{r, eval = F}
 
-system.time(predOcc500Det0.3 <- weightedDetection(occWeights = predWeights1km,
+system.time(predOcc500Det0.2 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
                               noOccur = 500,
-                              noLocations = seq(50, 300, by = 50),
+                              noLocations = seq(200, 1000, by = 200),
                               noVisits = 1,
-                              detectProb = 0.3,
+                              detectProb = 0.2,
                               nIter = 999))
 
 
-save(predOcc500Det0.3, file = "predOcc500Det0.3.Rdata")
+save(predOcc500Det0.2, file = "predOcc500Det0.2.Rdata")
 
 
 ```
 ```{r}
-load(file = "predOcc500Det0.3.Rdata")
-plot(predOcc500Det0.3)
-predOcc500Det0.3
+load(file = "predOcc500Det0.2.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.2)
+predOcc500Det0.2
 ```
 
 
 
 
-```{r}
+```{r, eval = F}
 
 system.time(predOcc200Det0.8 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
@@ -104,12 +99,12 @@ save(predOcc200Det0.8, file = "predOcc200Det0.8.Rdata")
 ```{r}
 
 load(file = "predOcc200Det0.8.Rdata")
-plot(predOcc200Det0.8)
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc200Det0.8)
 predOcc200Det0.8
 ```
 
 
-```{r}
+```{r, eval = F}
 
 system.time(predOcc100Det0.8 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
@@ -126,63 +121,128 @@ save(predOcc100Det0.8, file = "predOcc100Det0.8.Rdata")
 ```{r}
 
 load(file = "predOcc100Det0.8.Rdata")
-plot(predOcc100Det0.8)
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.8)
 predOcc100Det0.8
 ```
 
 
 
 
-```{r}
+```{r, eval = F}
 
-system.time(predOcc200Det0.3 <- weightedDetection(occWeights = predWeights1km,
+system.time(predOcc200Det0.2 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
                               noOccur = 200,
-                              noLocations = seq(50, 600, by = 50),
+                              noLocations = seq(200, 1000, by = 200),
                               noVisits = 1,
-                              detectProb = 0.3,
+                              detectProb = 0.2,
                               nIter = 999))
 
-save(predOcc200Det0.3, file = "predOcc200Det0.3.Rdata")
+save(predOcc200Det0.2, file = "predOcc200Det0.2.Rdata")
 
 
 ```
 ```{r}
 
-load(file = "predOcc200Det0.3.Rdata")
-plot(predOcc200Det0.3)
-predOcc200Det0.3
+load(file = "predOcc200Det0.2.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc200Det0.2)
+predOcc200Det0.2
 ```
 
 
-```{r}
+```{r, eval = F}
 
-system.time(predOcc100Det0.3 <- weightedDetection(occWeights = predWeights1km,
+system.time(predOcc100Det0.2 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
                               noOccur = 100,
-                              noLocations = seq(50, 600, by = 50),
+                              noLocations = seq(200, 1000, by = 200),
                               noVisits = 1,
-                              detectProb = 0.3,
+                              detectProb = 0.2,
                               nIter = 999))
 
-save(predOcc100Det0.3, file = "predOcc100Det0.3.Rdata")
+save(predOcc100Det0.2, file = "predOcc100Det0.2.Rdata")
 
 
 ```
 ```{r}
 
-load(file = "predOcc100Det0.3.Rdata")
-plot(predOcc100Det0.3)
-predOcc100Det0.3
+load(file = "predOcc100Det0.2.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.2)
+predOcc100Det0.2
 ```
 
-```{r, eval = T}
-knitr::opts_chunk$set(eval = T)
+
+```{r, eval = F}
+
+system.time(predOcc500Det0.5 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.5,
+                              nIter = 999))
+
+save(predOcc500Det0.5, file = "predOcc500Det0.5.Rdata")
+
+
 ```
+```{r}
+
+load(file = "predOcc500Det0.5.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet",
+     predOcc500Det0.5)
+predOcc500Det0.5
+```
+
+
+```{r, eval = F}
+
+system.time(predOcc200Det0.5 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 200,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.5,
+                              nIter = 999))
+
+save(predOcc200Det0.5, file = "predOcc200Det0.5.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc200Det0.5.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc200Det0.5)
+predOcc200Det0.5
+```
+
+```{r, eval = F}
+
+system.time(predOcc100Det0.5 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.5,
+                              nIter = 999))
+
+save(predOcc100Det0.5, file = "predOcc100Det0.5.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc100Det0.5.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.5)
+predOcc100Det0.5
+```
+
+
+
 
 Test visiting only 1/16 of the plot.
 
-```{r}
+```{r, eval = F}
 
 system.time(predOcc500Det0.05 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
@@ -199,18 +259,19 @@ save(predOcc500Det0.05, file = "predOcc500Det0.05.Rdata")
 ```{r}
 
 load(file = "predOcc500Det0.05.Rdata")
-plot(predOcc500Det0.05)
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.05)
 predOcc500Det0.05
 ```
 
 
+
 Test visit 4 times instead but lower no locations for same sample effort.
-```{r}
+```{r, eval = F}
 
 system.time(predOcc500Det0.05Vis4 <- weightedDetection(occWeights = predWeights1km,
                               visWeights = predWeights1km,
                               noOccur = 500,
-                              noLocations = seq(50, 250, by = 50),
+                              noLocations = seq(200, 1000, by = 200),
                               noVisits = 4,
                               detectProb = 0.8/16,
                               nIter = 999))
@@ -222,7 +283,150 @@ save(predOcc500Det0.05Vis4, file = "predOcc500Det0.05Vis4.Rdata")
 ```{r}
 
 load(file = "predOcc500Det0.05Vis4.Rdata")
-plot(predOcc500Det0.05Vis4)
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.05Vis4)
 predOcc500Det0.05Vis4
 ```
+
+
+
+Test visit 10 times instead but lower no locations for same sample effort.
+```{r, eval = F}
+
+system.time(predOcc500Det0.05Vis10 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 10,
+                              detectProb = 0.8/16,
+                              nIter = 999))
+
+save(predOcc500Det0.05Vis10, file = "predOcc500Det0.05Vis10.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc500Det0.05Vis10.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.05Vis10)
+predOcc500Det0.05Vis10
+```
+
+
+----------
+
+
+Even lower detectibility. 0.4/16
+
+```{r, eval = F}
+
+system.time(predOcc500Det0.025Vis4 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 4,
+                              detectProb = 0.4/16,
+                              nIter = 999))
+
+save(predOcc500Det0.025Vis4, file = "predOcc500Det0.025Vis4.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc500Det0.025Vis4.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.025Vis4)
+predOcc500Det0.025Vis4
+```
+
+
+
+Test visit 10 times instead but lower no locations for same sample effort.
+```{r, eval = F}
+
+system.time(predOcc500Det0.025Vis10 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 10,
+                              detectProb = 0.4/16,
+                              nIter = 999))
+
+save(predOcc500Det0.025Vis10, file = "predOcc500Det0.025Vis10.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc500Det0.025Vis10.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc500Det0.025Vis10)
+predOcc500Det0.025Vis10
+```
+
+Again 100 occurrences but with lower detectability
+
+```{r, eval = F}
+
+system.time(predOcc100Det0.05Vis1 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.8/16,
+                              nIter = 999))
+
+save(predOcc100Det0.05Vis1, file = "predOcc100Det0.05Vis1.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc100Det0.05Vis1.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.05Vis1)
+predOcc100Det0.05Vis1
+```
+
+
+```{r, eval = F}
+
+system.time(predOcc100Det0.05Vis4 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 4,
+                              detectProb = 0.8/16,
+                              nIter = 999))
+
+save(predOcc100Det0.05Vis4, file = "predOcc100Det0.05Vis4.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc100Det0.05Vis4.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.05Vis4)
+predOcc100Det0.05Vis4
+```
+
+
+```{r, eval = F}
+
+system.time(predOcc100Det0.05Vis10 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 10,
+                              detectProb = 0.8/16,
+                              nIter = 999))
+
+save(predOcc100Det0.05Vis10, file = "predOcc100Det0.05Vis10.Rdata")
+
+
+```
+```{r}
+
+load(file = "predOcc100Det0.05Vis10.Rdata")
+plot(threshold = 0.8, xlab = "Antall lokaliteter", ylab = "Observasjonssannsynlighet", predOcc100Det0.05Vis10)
+predOcc100Det0.05Vis10
+``` 
+
 
