@@ -7,13 +7,16 @@
 #'
 #' @param maxTime Total number of years of the study. Reasonably between 5 - 100 years.
 #' @param maxCapacity Maximum number of localities possible to survey each year.
-#' @param stepsCapacity Interval step size of number of localities per year. E.g. calculate possible regimes with 10, 20, and 30 number of localities per year.
+#' @param stepsCapacity Interval step size of number of localities per year. E.g. calculate possible regimes with 10, 20, and 30 number of localities per year. Defaults to maxCapacity.
 #'
 #' @export
 #'
 #' @return A tibble with potential survey regimes.
 
-sampleAlternatives <- function(maxTime, maxCapacity, stepsCapacity){
+sampleAlternatives <- function(maxTime, maxCapacity, stepsCapacity = NULL){
+
+  if(is.null(stepsCapacity)) {stepsCapacity = maxCapacity}
+
 
   r <- function(T, a, possible_t){
     l <- possible_t * a

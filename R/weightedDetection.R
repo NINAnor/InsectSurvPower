@@ -37,88 +37,88 @@
 #'
 #' @export
 
-#
-# weightedDetection <- function(occWeights = data.frame("sites" = 1:10,
-#                                                       "weights" = c(0.05,
-#                                                                     0.05,
-#                                                                     0.05,
-#                                                                     0.05,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.2,
-#                                                                     0.2)
-#                                                       ),
-#                               visWeights = data.frame("sites" = 1:10,
-#                                                       "weights" = c(0.05,
-#                                                                     0.05,
-#                                                                     0.05,
-#                                                                     0.05,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.1,
-#                                                                     0.2,
-#                                                                     0.2)
-#                               ),
-#                               noOccur = 5,
-#                               noLocations = 5,
-#                               noVisits = 5,
-#                               detectProb = 0.1,
-#                               nIter = 9999,
-#                               ...){
-#
-#   occWeights$weights <- occWeights$weights / sum(occWeights$weights)
-#   visWeights$weights <- visWeights$weights / sum(visWeights$weights)
-#
-#
-#             #Any occupied locations visited?
-#             visitOccFun <- function(visWeights.,
-#                                  occWeights.,
-#                                  noLocations.,
-#                                  noOccur.){
-#
-#               visited <- sample(visWeights.$sites, noLocations., prob = visWeights.$weights, replace = F)
-#               occupied <- sample(occWeights.$sites, noOccur., prob = occWeights.$weights, replace = F)
-#               ##any(visited %in% occupied)
-#              propVisitedOccupied =  sum(visited %in% occupied)/noLocations.
-#               return(propVisitedOccupied)
-#
-#
-#               }
-#
-#
-#           #How often do we visit occupied locations?
-#           propMatchFun <- function(visWeights.,
-#                                 occWeights.,
-#                                 noLocations.,
-#                                 noOccur.) {sum(replicate(nIter, visitOccFun(visWeights.,
-#                                                                          occWeights.,
-#                                                                          noLocations.,
-#                                                                          noOccur.)))/nIter}
-#
-#
-#         #Calculate for a set of number of locations visited
-#          propMatch <- sapply(noLocations, function(x) propMatchFun(visWeights. = visWeights,
-#                                                         occWeights. = occWeights,
-#                                                         noLocations. = x,
-#                                                         noOccur. = noOccur))
-#
-#
-#           probObs <- 1 - (1 - propMatch * (1 - (1 - detectProb) ^ noVisits)) ^ noLocations
-#
-#           out <- tibble::tibble("noLocations" = noLocations,
-#                         "probObs" = probObs)
-#
-#           class(out) <- c("detectProb", class(out))
-#
-#           return(out)
-#
-# }
-
 
 weightedDetection <- function(occWeights = data.frame("sites" = 1:10,
+                                                      "weights" = c(0.05,
+                                                                    0.05,
+                                                                    0.05,
+                                                                    0.05,
+                                                                    0.1,
+                                                                    0.1,
+                                                                    0.1,
+                                                                    0.1,
+                                                                    0.2,
+                                                                    0.2)
+),
+visWeights = data.frame("sites" = 1:10,
+                        "weights" = c(0.05,
+                                      0.05,
+                                      0.05,
+                                      0.05,
+                                      0.1,
+                                      0.1,
+                                      0.1,
+                                      0.1,
+                                      0.2,
+                                      0.2)
+),
+noOccur = 5,
+noLocations = 5,
+noVisits = 5,
+detectProb = 0.1,
+nIter = 999){
+
+  occWeights$weights <- occWeights$weights / sum(occWeights$weights)
+  visWeights$weights <- visWeights$weights / sum(visWeights$weights)
+
+
+  #Any occupied locations visited?
+  visitOccFun <- function(visWeights.,
+                          occWeights.,
+                          noLocations.,
+                          noOccur.){
+
+    visited <- sample(visWeights.$sites, noLocations., prob = visWeights.$weights, replace = F)
+    occupied <- sample(occWeights.$sites, noOccur., prob = occWeights.$weights, replace = F)
+
+    noMatch <- sum(visited %in% occupied)
+
+    obs <- rbinom(noMatch, noVisits, detectProb)
+    any(obs > 0)
+
+  }
+
+
+  #How often do we visit occupied locations?
+  propMatchFun <- function(visWeights.,
+                           occWeights.,
+                           noLocations.,
+                           noOccur.) {sum(replicate(nIter, visitOccFun(visWeights.,
+                                                                       occWeights.,
+                                                                       noLocations.,
+                                                                       noOccur.)))/nIter}
+
+
+  #Calculate for a set of number of locations visited
+  propMatch <- sapply(noLocations, function(x) propMatchFun(visWeights. = visWeights,
+                                                            occWeights. = occWeights,
+                                                            noLocations. = x,
+                                                            noOccur. = noOccur))
+
+
+  #probObs <- 1 - (1 - propMatch * (1 - (1 - detectProb) ^ noVisits)) ^ noLocations
+  probObs <- propMatch
+  out <- tibble::tibble("noLocations" = noLocations,
+                        "probObs" = probObs)
+
+  class(out) <- c("detectProb", class(out))
+
+  return(out)
+
+}
+
+
+weightedDetection2 <- function(occWeights = data.frame("sites" = 1:10,
                                                       "weights" = c(0.05,
                                                                     0.05,
                                                                     0.05,
@@ -180,7 +180,30 @@ nIter = 999){
                                                                        occWeights.,
                                                                        noLocations.,
                                                                        noOccur.)))/nIter}
+  bootProp <- function(visWeights.,
+                       occWeights.,
+                       noLocations.,
+                       noOccur.){
 
+  res <- replicate(9999, visitOccFun(visWeights.,
+                                      occWeights.,
+                                      noLocations.,
+                                      noOccur.))
+
+  bootFunc <- function(data, indices){
+    sum(data[indices]) / length(data[indices])
+  }
+
+  out <- boot(data = res, statistic = bootFunc, R = 1000)
+  out
+  }
+
+
+
+  bootRes <- sapply(noLocations, function(x) bootProp(visWeights. = visWeights,
+                                          occWeights. = occWeights,
+                                          noLocations. = x,
+                                          noOccur. = noOccur))
 
   #Calculate for a set of number of locations visited
   propMatch <- sapply(noLocations, function(x) propMatchFun(visWeights. = visWeights,
@@ -200,21 +223,22 @@ nIter = 999){
 
 }
 
-
 #' @export
 plot.detectProb <- function(detectProb,
                             lineCol = "blue",
                             lwd = 1.5,
-                            threshold = NULL){
+                            threshold = NULL,
+                            xlab = "Number of visited locations",
+                            ylab = "Observation probability"){
   p <- ggplot(detectProb) +
     geom_line(aes(x = noLocations,
                   y = probObs),
               col = lineCol,
               lwd = lwd) +
-    scale_x_continuous(name = "Number of visited locations",
+    scale_x_continuous(name = xlab,
                      breaks = detectProb$noLocations
                      ) +
-    scale_y_continuous(name = "Observation probability",
+    scale_y_continuous(name = ylab,
                        limits = c(0, 1))
 
  if(!is.null(threshold)){

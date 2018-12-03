@@ -1,9 +1,10 @@
 Package: SurveyPower
 Type: Package
-Title: Functions for calculating power of survey design.
-Version: 0.1.3
-Author: person("Jens", "Åström", email = "jens.astrom@nina.no",
-  role = c("aut", "cre"))
+Title: Functions for calculating power of survey design
+Version: 0.1.4
+Date: 2018-11-15
+Authors@R: c(person("Jens", "Åström", email = "jens.astrom@nina.no",
+  role = c("aut", "cre")))
 Maintainer: The package maintainer <jens.astrom@nina.no>
 Description: This is a package for internal use in NINA. 
   It contains functions and scripts to calculate power of survey design through simulations.

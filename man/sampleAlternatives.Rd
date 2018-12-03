@@ -4,14 +4,14 @@
 \alias{sampleAlternatives}
 \title{sampleAlternatives}
 \usage{
-sampleAlternatives(maxTime, maxCapacity, stepsCapacity)
+sampleAlternatives(maxTime, maxCapacity, stepsCapacity = NULL)
 }
 \arguments{
 \item{maxTime}{Total number of years of the study. Reasonably between 5 - 100 years.}
 
 \item{maxCapacity}{Maximum number of localities possible to survey each year.}
 
-\item{stepsCapacity}{Interval step size of number of localities per year. E.g. calculate possible regimes with 10, 20, and 30 number of localities per year.}
+\item{stepsCapacity}{Interval step size of number of localities per year. E.g. calculate possible regimes with 10, 20, and 30 number of localities per year. Defaults to maxCapacity.}
 }
 \value{
 A tibble with potential survey regimes.

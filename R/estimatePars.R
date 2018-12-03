@@ -99,6 +99,8 @@ estimatePars <- function(map = NULL,
                   "year:ARTYPESamferdsel" = as.numeric(paste0(as.character(map$params$artypeTrend$Samferdsel), collapse = "")),
                   "year:ARTYPESkog" = as.numeric(paste0(as.character(map$params$artypeTrend$Skog), collapse = "")))
 
+  #Set params to 0 if missing
+  fullParams[is.na(fullParams)] <- 0
 
   estHat <- lme4::fixef(modelRes)
   estSD <- sqrt(Matrix::diag(lme4::vcov.merMod(modelRes)))
@@ -175,4 +177,40 @@ estimatePars <- function(map = NULL,
   class(compList) <- c("estimatePar", "List")
 
   return(compList)
+}
+
+#' @export
+plot.estimatePar <- function(estimatePar, parameter){
+
+  lower <- estimatePar$lower %>%
+    as_tibble() %>%
+    gather(key = "param", value = "lower") %>%
+    mutate(iter = rep(1:nrow(estimatePar$lower), ncol(estimatePar$lower)))
+
+  upper <- estimatePar$upper %>%
+    as_tibble() %>%
+    gather(key = "param", value = "upper") %>%
+    mutate(iter = rep(1:nrow(estimatePar$upper), ncol(estimatePar$upper)))
+
+  est <- estimatePar$estHat %>%
+    as_tibble() %>%
+    gather(key = "param", value = "est") %>%
+    mutate(iter = rep(1:nrow(estimatePar$estHat), ncol(estimatePar$estHat)))
+
+  hat <- tibble(param = names(estimatePar$hat),
+                hat = estimatePar$hat)
+
+
+  lim <- lower %>%
+    inner_join(upper, by = c("param" = "param", "iter" = "iter")) %>%
+    inner_join(est, by = c("param" = "param", "iter" = "iter"))
+
+
+  p <- ggplot(lim, aes(x = param, y = est, group = param)) +
+    coord_flip() +
+    geom_linerange(aes(ymin = lower, ymax = upper), na.rm = T)+
+    geom_point(data = hat, aes(x = param, y = hat), color = "red")
+
+  p
+
 }

@@ -6,3 +6,5 @@ inst/doc
 */*.Rdata
 *.Rdata
 *.tif*
+*/figure/*
+temp_weight_calc_files/

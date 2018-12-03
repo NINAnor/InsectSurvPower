@@ -122,8 +122,17 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{2018-11-20}
+    \date{2018-11-23}
 
+
+% You know, for landscape
+\usepackage{lscape}
+\usepackage{pdfpages}
+
+
+% pandoc does not parse latex env - https://groups.google.com/forum/?fromgroups=#!topic/pandoc-discuss/oZETB5Ii1Cw
+\newcommand{\blandscape}{\begin{landscape}}
+\newcommand{\elandscape}{\end{landscape}}
 
 \begin{document}
 \maketitle
@@ -647,7 +656,7 @@ occurrence and visitation weights all are equal.
 
 \begin{verbatim}
 ##    user  system elapsed 
-##   2.724   0.008   2.733
+##   2.717   0.000   2.717
 \end{verbatim}
 
 \begin{Shaded}
@@ -660,10 +669,10 @@ occurrence and visitation weights all are equal.
 ## # A tibble: 4 x 2
 ##   noLocations probObs
 ##         <dbl>   <dbl>
-## 1        50.0  0.0651
-## 2       100    0.114 
-## 3       150    0.190 
-## 4       200    0.252
+## 1        50.0  0.0691
+## 2       100    0.142 
+## 3       150    0.143 
+## 4       200    0.219
 \end{verbatim}
 
 \begin{Shaded}
@@ -700,7 +709,7 @@ function.
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.07807808
+## [1] 0.05505506
 \end{verbatim}
 
 We get the same results if the occurrence probabilities is distributed
@@ -724,7 +733,7 @@ just 1 visit per site.
 
 \begin{verbatim}
 ##    user  system elapsed 
-##   3.720   0.004   3.725
+##   3.703   0.004   3.708
 \end{verbatim}
 
 \begin{Shaded}
@@ -737,10 +746,10 @@ just 1 visit per site.
 ## # A tibble: 4 x 2
 ##   noLocations probObs
 ##         <dbl>   <dbl>
-## 1        50.0   0.408
-## 2       100     0.641
-## 3       150     0.797
-## 4       200     0.869
+## 1        50.0   0.399
+## 2       100     0.644
+## 3       150     0.804
+## 4       200     0.878
 \end{verbatim}
 
 \begin{Shaded}
@@ -1151,7 +1160,7 @@ encompass the areas with highest predictions.
 \StringTok{    }\KeywordTok{select}\NormalTok{(ssbid, kommune)}
 
 
-\KeywordTok{plot}\NormalTok{(ssbidToVisit[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(ssbidToVisit[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{, }\DataTypeTok{border =} \DecValTok{0}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1195,7 +1204,7 @@ One of several possible demarcations of ``Bergen area''
 \NormalTok{    kommune)}
 
 
-\KeywordTok{plot}\NormalTok{(ssbidBergen[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(ssbidBergen[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{, }\DataTypeTok{border =} \DecValTok{0}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1237,7 +1246,7 @@ One of several possible demarcations of ``Bergen area''
 \StringTok{    }\KeywordTok{select}\NormalTok{(ssbid, kommune)}
 
 
-\KeywordTok{plot}\NormalTok{(ssbidTrondheim[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(ssbidTrondheim[}\StringTok{"kommune"}\NormalTok{], }\DataTypeTok{key.width =} \KeywordTok{lcm}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{key.pos =} \DecValTok{4}\NormalTok{, }\DataTypeTok{border =} \DecValTok{0}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1289,7 +1298,7 @@ Run calculations
     \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{oslo140Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
-    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
     \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{## Bergen}
@@ -1311,7 +1320,7 @@ Run calculations
     \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{bergen140Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
-    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
     \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 
@@ -1337,9 +1346,12 @@ Run calculations
     \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{trondheim140Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
-    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
     \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
+\NormalTok{norge140Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 
 \CommentTok{# Norge}
@@ -1360,9 +1372,6 @@ Run calculations
 \NormalTok{norge200Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
     \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
-\NormalTok{norge140Sites16 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
-    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
-    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
 
 
 \NormalTok{## small expensive 2 visits, 1.5 detection prob}
@@ -1430,6 +1439,8 @@ Run calculations
 \end{Highlighting}
 \end{Shaded}
 
+\blandscape
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{xtable}\NormalTok{(surTab, }\DataTypeTok{caption =} \StringTok{"Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey."}\NormalTok{)}
@@ -1455,9 +1466,9 @@ Norge & 47.00 & 1.00 & 0.43 & 0.03 & 0.01 \\
   Bergen & 100.00 & 1.00 & 0.43 & 0.03 & 0.03 \\ 
   Trondheim & 100.00 & 1.00 & 0.43 & 0.03 & 0.02 \\ 
   Norge & 140.00 & 1.00 & 0.64 & 0.04 & 0.05 \\ 
-  Oslo & 140.00 & 1.00 & 0.64 & 0.04 & 0.77 \\ 
-  Bergen & 140.00 & 1.00 & 0.64 & 0.04 & 0.70 \\ 
-  Trondheim & 140.00 & 1.00 & 0.64 & 0.04 & 0.52 \\ 
+  Oslo & 140.00 & 1.00 & 0.64 & 0.04 & 0.10 \\ 
+  Bergen & 140.00 & 1.00 & 0.64 & 0.04 & 0.07 \\ 
+  Trondheim & 140.00 & 1.00 & 0.64 & 0.04 & 0.05 \\ 
   Norge & 200.00 & 1.00 & 0.43 & 0.03 & 0.05 \\ 
   Oslo & 200.00 & 1.00 & 0.43 & 0.03 & 0.07 \\ 
   Bergen & 200.00 & 1.00 & 0.43 & 0.03 & 0.07 \\ 
@@ -1471,8 +1482,594 @@ Norge & 47.00 & 1.00 & 0.43 & 0.03 & 0.01 \\
 \caption{Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey.} 
 \end{table}
 
+\elandscape
+
 How much less is the prob using a subarea? (not much difference it
 seems)
+
+Calculate the same for 6 year period (cannot split 5 years in two, for
+the alternative of repeated surveys each year.)
+
+Run calculations for 6 years.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{oslo47Sites6Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo47Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo100Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{oslo66Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo200Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo140Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{## Bergen}
+\NormalTok{bergen47Sites6Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen47Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen100Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{bergen66Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen200Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen140Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+
+
+\NormalTok{## Trondheim}
+
+\NormalTok{trondheim47Sites6Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim47Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim100Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{trondheim66Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim200Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim140Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge140Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\CommentTok{# Norge}
+\NormalTok{norge47Sites6Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge47Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge100Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{norge66Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge200Sites166Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+
+\NormalTok{## small expensive 2 visits, 1.5 detection prob}
+
+\NormalTok{norge50Sites16Vis26Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo50Sites16Vis26Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{bergen50Sites16Vis26Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{trondheim50Sites16Vis26Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\KeywordTok{save}\NormalTok{(oslo47Sites6Years, oslo47Sites166Years, oslo66Sites166Years, oslo100Sites166Years, }
+\NormalTok{    oslo140Sites166Years, oslo200Sites166Years, oslo50Sites16Vis26Years, bergen47Sites6Years, }
+\NormalTok{    bergen47Sites166Years, bergen66Sites166Years, bergen100Sites166Years, bergen140Sites166Years, }
+\NormalTok{    bergen200Sites166Years, bergen50Sites16Vis26Years, trondheim47Sites6Years, }
+\NormalTok{    trondheim47Sites166Years, trondheim66Sites166Years, trondheim100Sites166Years, }
+\NormalTok{    trondheim140Sites166Years, trondheim200Sites166Years, trondheim50Sites16Vis26Years, }
+\NormalTok{    norge47Sites6Years, norge47Sites166Years, norge66Sites166Years, norge100Sites166Years, }
+\NormalTok{    norge140Sites166Years, norge200Sites166Years, norge50Sites16Vis26Years, }
+    \DataTypeTok{file =} \StringTok{"survey_calc6years.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{load}\NormalTok{(}\StringTok{"survey_calc6years.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{surTab6Years <-}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Areal =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"Norge"}\NormalTok{, }\StringTok{"Oslo"}\NormalTok{, }\StringTok{"Bergen"}\NormalTok{, }\StringTok{"Trondheim"}\NormalTok{), }
+    \DataTypeTok{times =} \DecValTok{6}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall lokaliteter per år}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{47}\NormalTok{, }\DecValTok{66}\NormalTok{, }\DecValTok{100}\NormalTok{, }\DecValTok{140}\NormalTok{, }\DecValTok{200}\NormalTok{, }
+    \DecValTok{50}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall lokaliteter totalt}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DecValTok{100} \OperatorTok{*}\StringTok{ }
+\StringTok{    }\DecValTok{6}\NormalTok{, }\DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall besøk}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }
+    \DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Deteksjonsrate 250x250m}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\FloatTok{0.426}\NormalTok{, }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }
+    \FloatTok{0.426}\NormalTok{, }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\FloatTok{0.426}\NormalTok{, }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{))}
+
+
+
+
+
+
+
+\NormalTok{surTab6Years <-}\StringTok{ }\NormalTok{surTab6Years }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\StringTok{`}\DataTypeTok{Deteksjonerate 1x1km}\StringTok{`}\NormalTok{ =}\StringTok{ `}\DataTypeTok{Deteksjonsrate 250x250m}\StringTok{`}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{    `}\DataTypeTok{Antall besøk}\StringTok{`}\NormalTok{, }\DataTypeTok{Oppdagbarhet =} \KeywordTok{c}\NormalTok{(norge47Sites166Years}\OperatorTok{$}\NormalTok{probObs, oslo47Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    bergen47Sites166Years}\OperatorTok{$}\NormalTok{probObs, trondheim47Sites166Years}\OperatorTok{$}\NormalTok{probObs, norge66Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    oslo66Sites166Years}\OperatorTok{$}\NormalTok{probObs, bergen66Sites166Years}\OperatorTok{$}\NormalTok{probObs, trondheim66Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    norge100Sites166Years}\OperatorTok{$}\NormalTok{probObs, oslo100Sites166Years}\OperatorTok{$}\NormalTok{probObs, bergen100Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    trondheim100Sites166Years}\OperatorTok{$}\NormalTok{probObs, norge140Sites166Years}\OperatorTok{$}\NormalTok{probObs, oslo140Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    bergen140Sites166Years}\OperatorTok{$}\NormalTok{probObs, trondheim140Sites166Years}\OperatorTok{$}\NormalTok{probObs, norge200Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    oslo200Sites166Years}\OperatorTok{$}\NormalTok{probObs, bergen200Sites166Years}\OperatorTok{$}\NormalTok{probObs, trondheim200Sites166Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    norge50Sites16Vis26Years}\OperatorTok{$}\NormalTok{probObs, oslo50Sites16Vis26Years}\OperatorTok{$}\NormalTok{probObs, bergen50Sites16Vis26Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    trondheim50Sites16Vis26Years}\OperatorTok{$}\NormalTok{probObs))}
+
+\CommentTok{# surTab}
+\end{Highlighting}
+\end{Shaded}
+
+\blandscape
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{xtable}\NormalTok{(surTab6Years, }\DataTypeTok{caption =} \StringTok{"Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 years of surveying visiting each location only one year."}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrrr}
+  \hline
+Areal & Antall lokaliteter per år & Antall lokaliteter totalt & Antall besøk & Deteksjonsrate 250x250m & Deteksjonerate 1x1km & Oppdagbarhet \\ 
+  \hline
+Norge & 47.00 & 282.00 & 1.00 & 0.43 & 0.03 & 0.06 \\ 
+  Oslo & 47.00 & 282.00 & 1.00 & 0.43 & 0.03 & 0.08 \\ 
+  Bergen & 47.00 & 282.00 & 1.00 & 0.43 & 0.03 & 0.09 \\ 
+  Trondheim & 47.00 & 282.00 & 1.00 & 0.43 & 0.03 & 0.07 \\ 
+  Norge & 66.00 & 396.00 & 1.00 & 0.64 & 0.04 & 0.17 \\ 
+  Oslo & 66.00 & 396.00 & 1.00 & 0.64 & 0.04 & 0.18 \\ 
+  Bergen & 66.00 & 396.00 & 1.00 & 0.64 & 0.04 & 0.19 \\ 
+  Trondheim & 66.00 & 396.00 & 1.00 & 0.64 & 0.04 & 0.12 \\ 
+  Norge & 100.00 & 600.00 & 1.00 & 0.43 & 0.03 & 0.14 \\ 
+  Oslo & 100.00 & 600.00 & 1.00 & 0.43 & 0.03 & 0.17 \\ 
+  Bergen & 100.00 & 600.00 & 1.00 & 0.43 & 0.03 & 0.18 \\ 
+  Trondheim & 100.00 & 600.00 & 1.00 & 0.43 & 0.03 & 0.12 \\ 
+  Norge & 140.00 & 840.00 & 1.00 & 0.64 & 0.04 & 0.29 \\ 
+  Oslo & 140.00 & 840.00 & 1.00 & 0.64 & 0.04 & 0.30 \\ 
+  Bergen & 140.00 & 840.00 & 1.00 & 0.64 & 0.04 & 0.34 \\ 
+  Trondheim & 140.00 & 840.00 & 1.00 & 0.64 & 0.04 & 0.21 \\ 
+  Norge & 200.00 & 1200.00 & 1.00 & 0.43 & 0.03 & 0.28 \\ 
+  Oslo & 200.00 & 1200.00 & 1.00 & 0.43 & 0.03 & 0.28 \\ 
+  Bergen & 200.00 & 1200.00 & 1.00 & 0.43 & 0.03 & 0.34 \\ 
+  Trondheim & 200.00 & 1200.00 & 1.00 & 0.43 & 0.03 & 0.19 \\ 
+  Norge & 50.00 & 300.00 & 2.00 & 0.64 & 0.08 & 0.23 \\ 
+  Oslo & 50.00 & 300.00 & 2.00 & 0.64 & 0.08 & 0.27 \\ 
+  Bergen & 50.00 & 300.00 & 2.00 & 0.64 & 0.08 & 0.25 \\ 
+  Trondheim & 50.00 & 300.00 & 2.00 & 0.64 & 0.08 & 0.17 \\ 
+   \hline
+\end{tabular}
+\caption{Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 years of surveying visiting each location only one year.} 
+\end{table}
+
+\elandscape
+
+Calculate the same but where we revisit each location 2 times. With 47
+lokations per year, this gives us in total 47*3 = 141 locations but
+double the area covered within the same location. We can also measure
+the spread of known distibutions between the 3 years.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{oslo47Sites3Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo47Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo100Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{oslo66Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo200Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo140Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{## Bergen}
+\NormalTok{bergen47Sites3Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen47Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen100Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{bergen66Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen200Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{bergen140Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+
+
+\NormalTok{## Trondheim}
+
+\NormalTok{trondheim47Sites3Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim47Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim100Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{trondheim66Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim200Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{trondheim140Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge140Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\CommentTok{# Norge}
+\NormalTok{norge47Sites3Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge47Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge100Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{100} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{norge66Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norge200Sites163Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }
+    \DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+
+\NormalTok{## small expensive 2 visits, 1.5 detection prob}
+
+\NormalTok{norge50Sites16Vis23Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{oslo50Sites16Vis23Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ osloVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{bergen50Sites16Vis23Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ bergenVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{trondheim50Sites16Vis23Years <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ trondheimVisWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{6}\NormalTok{, }\DataTypeTok{detectProb =} \DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{2} \OperatorTok{*}\StringTok{ }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\KeywordTok{save}\NormalTok{(oslo47Sites3Years, oslo47Sites163Years, oslo66Sites163Years, oslo100Sites163Years, }
+\NormalTok{    oslo140Sites163Years, oslo200Sites163Years, oslo50Sites16Vis23Years, bergen47Sites3Years, }
+\NormalTok{    bergen47Sites163Years, bergen66Sites163Years, bergen100Sites163Years, bergen140Sites163Years, }
+\NormalTok{    bergen200Sites163Years, bergen50Sites16Vis23Years, trondheim47Sites3Years, }
+\NormalTok{    trondheim47Sites163Years, trondheim66Sites163Years, trondheim100Sites163Years, }
+\NormalTok{    trondheim140Sites163Years, trondheim200Sites163Years, trondheim50Sites16Vis23Years, }
+\NormalTok{    norge47Sites3Years, norge47Sites163Years, norge66Sites163Years, norge100Sites163Years, }
+\NormalTok{    norge140Sites163Years, norge200Sites163Years, norge50Sites16Vis23Years, }
+    \DataTypeTok{file =} \StringTok{"survey_calc3Years.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{load}\NormalTok{(}\StringTok{"survey_calc3Years.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{surTab3years <-}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Areal =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"Norge"}\NormalTok{, }\StringTok{"Oslo"}\NormalTok{, }\StringTok{"Bergen"}\NormalTok{, }\StringTok{"Trondheim"}\NormalTok{), }
+    \DataTypeTok{times =} \DecValTok{6}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall lokaliteter per år}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{47}\NormalTok{, }\DecValTok{66}\NormalTok{, }\DecValTok{100}\NormalTok{, }\DecValTok{140}\NormalTok{, }\DecValTok{200}\NormalTok{, }
+    \DecValTok{50}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall lokaliteter totalt}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{47} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{66} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{100} \OperatorTok{*}\StringTok{ }
+\StringTok{    }\DecValTok{3}\NormalTok{, }\DecValTok{140} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{200} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{, }\DecValTok{50} \OperatorTok{*}\StringTok{ }\DecValTok{3}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Antall besøk}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }
+    \DecValTok{1} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{1} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{1} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{1} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{, }\DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{), }\StringTok{`}\DataTypeTok{Deteksjonsrate 250x250m}\StringTok{`}\NormalTok{ =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\FloatTok{0.426}\NormalTok{, }
+    \FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\FloatTok{0.426}\NormalTok{, }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{, }\FloatTok{0.426}\NormalTok{, }\FloatTok{0.426} \OperatorTok{*}\StringTok{ }\FloatTok{1.5}\NormalTok{), }\DataTypeTok{each =} \DecValTok{4}\NormalTok{))}
+
+
+
+
+
+
+
+\NormalTok{surTab3years <-}\StringTok{ }\NormalTok{surTab3years }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\StringTok{`}\DataTypeTok{Deteksjonerate 1x1km}\StringTok{`}\NormalTok{ =}\StringTok{ `}\DataTypeTok{Deteksjonsrate 250x250m}\StringTok{`}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{    `}\DataTypeTok{Antall besøk}\StringTok{`}\NormalTok{, }\DataTypeTok{Oppdagbarhet =} \KeywordTok{c}\NormalTok{(norge47Sites163Years}\OperatorTok{$}\NormalTok{probObs, oslo47Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    bergen47Sites163Years}\OperatorTok{$}\NormalTok{probObs, trondheim47Sites163Years}\OperatorTok{$}\NormalTok{probObs, norge66Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    oslo66Sites163Years}\OperatorTok{$}\NormalTok{probObs, bergen66Sites163Years}\OperatorTok{$}\NormalTok{probObs, trondheim66Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    norge100Sites163Years}\OperatorTok{$}\NormalTok{probObs, oslo100Sites163Years}\OperatorTok{$}\NormalTok{probObs, bergen100Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    trondheim100Sites163Years}\OperatorTok{$}\NormalTok{probObs, norge140Sites163Years}\OperatorTok{$}\NormalTok{probObs, oslo140Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    bergen140Sites163Years}\OperatorTok{$}\NormalTok{probObs, trondheim140Sites163Years}\OperatorTok{$}\NormalTok{probObs, norge200Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    oslo200Sites163Years}\OperatorTok{$}\NormalTok{probObs, bergen200Sites163Years}\OperatorTok{$}\NormalTok{probObs, trondheim200Sites163Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    norge50Sites16Vis23Years}\OperatorTok{$}\NormalTok{probObs, oslo50Sites16Vis23Years}\OperatorTok{$}\NormalTok{probObs, bergen50Sites16Vis23Years}\OperatorTok{$}\NormalTok{probObs, }
+\NormalTok{    trondheim50Sites16Vis23Years}\OperatorTok{$}\NormalTok{probObs))}
+
+\CommentTok{# surTab}
+\end{Highlighting}
+\end{Shaded}
+
+\blandscape
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{xtable}\NormalTok{(surTab3years, }\DataTypeTok{caption =} \StringTok{"Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 year period visiting each location 2 years."}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrrr}
+  \hline
+Areal & Antall lokaliteter per år & Antall lokaliteter totalt & Antall besøk & Deteksjonsrate 250x250m & Deteksjonerate 1x1km & Oppdagbarhet \\ 
+  \hline
+Norge & 47.00 & 141.00 & 2.00 & 0.43 & 0.05 & 0.07 \\ 
+  Oslo & 47.00 & 141.00 & 2.00 & 0.43 & 0.05 & 0.12 \\ 
+  Bergen & 47.00 & 141.00 & 2.00 & 0.43 & 0.05 & 0.10 \\ 
+  Trondheim & 47.00 & 141.00 & 2.00 & 0.43 & 0.05 & 0.07 \\ 
+  Norge & 66.00 & 198.00 & 2.00 & 0.64 & 0.08 & 0.16 \\ 
+  Oslo & 66.00 & 198.00 & 2.00 & 0.64 & 0.08 & 0.24 \\ 
+  Bergen & 66.00 & 198.00 & 2.00 & 0.64 & 0.08 & 0.20 \\ 
+  Trondheim & 66.00 & 198.00 & 2.00 & 0.64 & 0.08 & 0.12 \\ 
+  Norge & 100.00 & 300.00 & 2.00 & 0.43 & 0.05 & 0.14 \\ 
+  Oslo & 100.00 & 300.00 & 2.00 & 0.43 & 0.05 & 0.19 \\ 
+  Bergen & 100.00 & 300.00 & 2.00 & 0.43 & 0.05 & 0.19 \\ 
+  Trondheim & 100.00 & 300.00 & 2.00 & 0.43 & 0.05 & 0.12 \\ 
+  Norge & 140.00 & 420.00 & 2.00 & 0.64 & 0.08 & 0.31 \\ 
+  Oslo & 140.00 & 420.00 & 2.00 & 0.64 & 0.08 & 0.37 \\ 
+  Bergen & 140.00 & 420.00 & 2.00 & 0.64 & 0.08 & 0.37 \\ 
+  Trondheim & 140.00 & 420.00 & 2.00 & 0.64 & 0.08 & 0.25 \\ 
+  Norge & 200.00 & 600.00 & 2.00 & 0.43 & 0.05 & 0.29 \\ 
+  Oslo & 200.00 & 600.00 & 2.00 & 0.43 & 0.05 & 0.30 \\ 
+  Bergen & 200.00 & 600.00 & 2.00 & 0.43 & 0.05 & 0.33 \\ 
+  Trondheim & 200.00 & 600.00 & 2.00 & 0.43 & 0.05 & 0.20 \\ 
+  Norge & 50.00 & 150.00 & 4.00 & 0.64 & 0.16 & 0.19 \\ 
+  Oslo & 50.00 & 150.00 & 4.00 & 0.64 & 0.16 & 0.47 \\ 
+  Bergen & 50.00 & 150.00 & 4.00 & 0.64 & 0.16 & 0.46 \\ 
+  Trondheim & 50.00 & 150.00 & 4.00 & 0.64 & 0.16 & 0.33 \\ 
+   \hline
+\end{tabular}
+\caption{Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 year period visiting each location 2 years.} 
+\end{table}
+
+\elandscape
+
+Calculate the number of locations and visits needed given the empirical
+detection rates.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{norgeDet0.426Vis1 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\NormalTok{norgeDet0.426Vis4 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{        }\DecValTok{4}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norgeDet0.426Vis10 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.426}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{        }\DecValTok{10}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norgeDet0.639Vis1 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.639}\OperatorTok{/}\DecValTok{16}\NormalTok{, }
+    \DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norgeDet0.639Vis4 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.639}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{        }\DecValTok{4}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{norgeDet0.639Vis10 <-}\StringTok{ }\KeywordTok{weightedDetection}\NormalTok{(}\DataTypeTok{occWeights =}\NormalTok{ occWeights, }\DataTypeTok{visWeights =}\NormalTok{ occWeights, }
+    \DataTypeTok{noOccur =} \DecValTok{500}\NormalTok{, }\DataTypeTok{noLocations =} \KeywordTok{seq}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\DataTypeTok{by =} \DecValTok{100}\NormalTok{), }\DataTypeTok{detectProb =} \FloatTok{0.639}\OperatorTok{/}\DecValTok{16} \OperatorTok{*}\StringTok{ }
+\StringTok{        }\DecValTok{10}\NormalTok{, }\DataTypeTok{nIter =} \DecValTok{999}\NormalTok{, }\DataTypeTok{noVisits =} \DecValTok{1}\NormalTok{)}
+
+
+\KeywordTok{save}\NormalTok{(norgeDet0.426Vis1, norgeDet0.426Vis4, norgeDet0.426Vis10, norgeDet0.639Vis1, }
+\NormalTok{    norgeDet0.639Vis4, norgeDet0.639Vis10, }\DataTypeTok{file =} \StringTok{"neededLocEmp.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{load}\NormalTok{(}\StringTok{"neededLocEmp.Rdata"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.426Vis1, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.426Vis1-1.png}
+\caption{Observation probability given a detection probability of 0.426
+with 1 visit to a 1/16 part of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.426Vis4, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.426Vis4-1.png}
+\caption{Observation probability given a detection probability of 0.426
+with 1 visits to 4 1/16 parts of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.426Vis10, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.426Vis10-1.png}
+\caption{Observation probability given a detection probability of 0.426
+with 1 visits to 10 1/16 parts of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.639Vis1, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.639Vis1-1.png}
+\caption{Observation probability given a detection probability of 0.639
+with one visit to a 1/16 part of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.639Vis4, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.639Vis4-1.png}
+\caption{Observation probability given a detection probability of 0.639
+with one visit to 4 1/16 parts of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(norgeDet0.639Vis10, }\DataTypeTok{threshold =} \FloatTok{0.8}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Antall lokaliteter"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Observasjonssannsynlighet"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{figure/norgeDet0.639Vis10-1.png}
+\caption{Observation probability given a detection probability of 0.639
+with one visit to 10 1/16 parts of a 1km\^{}2 cell. Sampling the whole
+country.}
+\end{figure}
 
 \section{References}\label{references}
 

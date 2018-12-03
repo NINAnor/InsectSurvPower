@@ -7,6 +7,8 @@ output:
     keep_tex: true
     latex_engine: xelatex
     fig_caption: yes
+    includes:
+          in_header: header.tex
 ---
 
 
@@ -692,7 +694,8 @@ ssbidToVisit <- map1km %>%
   select(ssbid, kommune)
 
 
-plot(ssbidToVisit["kommune"], key.width =  lcm(4), key.pos = 4)
+plot(ssbidToVisit["kommune"], key.width =  lcm(4), key.pos = 4,
+     border = 0)
 ```
 
 
@@ -734,7 +737,8 @@ ssbidBergen <- map1km %>%
   select(ssbid, kommune)
 
 
-plot(ssbidBergen["kommune"], key.width =  lcm(4), key.pos = 4)
+plot(ssbidBergen["kommune"], key.width =  lcm(4), key.pos = 4,
+     border = 0)
 
 ```
 
@@ -768,7 +772,9 @@ ssbidTrondheim <- map1km %>%
   select(ssbid, kommune)
 
 
-plot(ssbidTrondheim["kommune"], key.width =  lcm(4), key.pos = 4)
+plot(ssbidTrondheim["kommune"], 
+     key.width =  lcm(4), key.pos = 4,
+     border = 0)
 
 ```
 
@@ -827,7 +833,7 @@ oslo140Sites16 <- weightedDetection(occWeights = occWeights,
                   visWeights = osloVisWeights,
                   noOccur = 500,
                   noLocations = 140,
-                  detectProb = 0.426*1.5,
+                  detectProb = 0.426*1.5/16,
                   nIter = 999,
                   noVisits = 1)
 
@@ -877,7 +883,7 @@ bergen140Sites16 <- weightedDetection(occWeights = occWeights,
                   visWeights = bergenVisWeights,
                   noOccur = 500,
                   noLocations = 140,
-                  detectProb = 0.426*1.5,
+                  detectProb = 0.426*1.5/16,
                   nIter = 999,
                   noVisits = 1)
 
@@ -931,10 +937,17 @@ trondheim140Sites16 <- weightedDetection(occWeights = occWeights,
                   visWeights = trondheimVisWeights,
                   noOccur = 500,
                   noLocations = 140,
-                  detectProb = 0.426*1.5,
+                  detectProb = 0.426*1.5/16,
                   nIter = 999,
                   noVisits = 1)
 
+norge140Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 140,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
 
 
 #Norge
@@ -979,13 +992,6 @@ norge200Sites16 <- weightedDetection(occWeights = occWeights,
                   nIter = 999,
                   noVisits = 1)
 
-norge140Sites16 <- weightedDetection(occWeights = occWeights,
-                  visWeights = occWeights,
-                  noOccur = 500,
-                  noLocations = 140,
-                  detectProb = 0.426*1.5/16,
-                  nIter = 999,
-                  noVisits = 1)
 
 
 ##small expensive 
@@ -1083,23 +1089,664 @@ surTab <- surTab %>%
 
 ```
 
+\blandscape
+
 ```{r surTab, results = "asis"}
 
 xtable(surTab, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey.")
 ```
+\elandscape
 
 How much less is the prob using a subarea? (not much difference it seems)
 
+Calculate the same for 6 year period (cannot split 5 years in two, for the alternative of repeated surveys each year.)
+
+
+Run calculations for 6 years.
+```{r run_survey_calc6years, eval = T}
+oslo47Sites6Years <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo47Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo100Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+oslo66Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo200Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo140Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+##Bergen
+bergen47Sites6Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen47Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen100Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+bergen66Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen200Sites166Years <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen140Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+
+
+##Trondheim
+
+trondheim47Sites6Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim47Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim100Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+trondheim66Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim200Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim140Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge140Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 140*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+#Norge
+norge47Sites6Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge47Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge100Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 100*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+norge66Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 66*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge200Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 200*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+
+##small expensive 
+#2 visits, 1.5 detection prob
+
+norge50Sites16Vis26Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo50Sites16Vis26Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+bergen50Sites16Vis26Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+trondheim50Sites16Vis26Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+save(oslo47Sites6Years, oslo47Sites166Years, oslo66Sites166Years, oslo100Sites166Years, oslo140Sites166Years, oslo200Sites166Years, oslo50Sites16Vis26Years,
+     bergen47Sites6Years, bergen47Sites166Years, bergen66Sites166Years, bergen100Sites166Years, bergen140Sites166Years, bergen200Sites166Years, bergen50Sites16Vis26Years,
+     trondheim47Sites6Years, trondheim47Sites166Years, trondheim66Sites166Years, trondheim100Sites166Years, trondheim140Sites166Years, trondheim200Sites166Years, trondheim50Sites16Vis26Years,
+      norge47Sites6Years, norge47Sites166Years, norge66Sites166Years, norge100Sites166Years, norge140Sites166Years, norge200Sites166Years, norge50Sites16Vis26Years,
+     file = "survey_calc6years.Rdata")
+ 
+```
+
+```{r}
+load("survey_calc6years.Rdata")
+```
+
+
+```{r makeSurveTable6years}
+
+surTab6Years <- tibble("Areal" = rep(c("Norge",
+                             "Oslo",
+                             "Bergen",
+                             "Trondheim"), times = 6),
+                 "Antall lokaliteter per år" = rep(c(47,
+                                          66,
+                                          100,
+                                          140,
+                                          200,
+                                          50), each = 4),
+                  "Antall lokaliteter totalt" = rep(c(47*6,
+                                          66*6,
+                                          100*6,
+                                          140*6,
+                                          200*6,
+                                          50*6), each = 4),
+                 "Antall besøk" = rep(c(1,
+                                       1,
+                                       1,
+                                       1,
+                                       1,
+                                       2), each = 4),
+                 "Deteksjonsrate 250x250m" = rep(c(0.426,
+                                                   0.426 * 1.5,
+                                                   0.426,
+                                                   0.426*1.5,
+                                                   0.426,
+                                                   0.426*1.5), each = 4))
+
+                 
+
+
+
+
+
+surTab6Years <- surTab6Years %>% 
+  mutate("Deteksjonerate 1x1km" = `Deteksjonsrate 250x250m` /16 * `Antall besøk`,
+    "Oppdagbarhet" = c(norge47Sites166Years$probObs, oslo47Sites166Years$probObs, bergen47Sites166Years$probObs, trondheim47Sites166Years$probObs,
+                            norge66Sites166Years$probObs, oslo66Sites166Years$probObs, bergen66Sites166Years$probObs, trondheim66Sites166Years$probObs,
+                            norge100Sites166Years$probObs, oslo100Sites166Years$probObs, bergen100Sites166Years$probObs, trondheim100Sites166Years$probObs,
+                            norge140Sites166Years$probObs, oslo140Sites166Years$probObs, bergen140Sites166Years$probObs, trondheim140Sites166Years$probObs,
+                            norge200Sites166Years$probObs, oslo200Sites166Years$probObs, bergen200Sites166Years$probObs, trondheim200Sites166Years$probObs,
+                            norge50Sites16Vis26Years$probObs, oslo50Sites16Vis26Years$probObs, bergen50Sites16Vis26Years$probObs, trondheim50Sites16Vis26Years$probObs
+                                    ))
+
+#surTab
+
+```
+
+\blandscape
+
+```{r surTab6years, results = "asis"}
+
+xtable(surTab6Years, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 years of surveying visiting each location only one year.")
+```
+\elandscape
+
+Calculate the same but where we revisit each location 2 times. With 47 lokations per year, this gives us in total 47*3 = 141 locations but double the area covered within the same location. We can also measure the spread of known distibutions between the 3 years.
+
+
+```{r run_survey_calc3years, eval = T}
+oslo47Sites3Years <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo47Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo100Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+oslo66Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo200Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo140Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+##Bergen
+bergen47Sites3Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen47Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen100Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+bergen66Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen200Sites163Years <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+bergen140Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+
+
+##Trondheim
+
+trondheim47Sites3Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim47Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim100Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+trondheim66Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim200Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+trondheim140Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge140Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 140*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+#Norge
+norge47Sites3Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge47Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge100Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 100*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+norge66Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 66*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+norge200Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 200*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+
+##small expensive 
+#2 visits, 1.5 detection prob
+
+norge50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = occWeights,
+                  noOccur = 500,
+                  noLocations = 50*3,
+                  detectProb = 2*2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+oslo50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = osloVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 2*2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+bergen50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = bergenVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 2*2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+trondheim50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = trondheimVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 2*2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+save(oslo47Sites3Years, oslo47Sites163Years, oslo66Sites163Years, oslo100Sites163Years, oslo140Sites163Years, oslo200Sites163Years, oslo50Sites16Vis23Years,
+     bergen47Sites3Years, bergen47Sites163Years, bergen66Sites163Years, bergen100Sites163Years, bergen140Sites163Years, bergen200Sites163Years, bergen50Sites16Vis23Years,
+     trondheim47Sites3Years, trondheim47Sites163Years, trondheim66Sites163Years, trondheim100Sites163Years, trondheim140Sites163Years, trondheim200Sites163Years, trondheim50Sites16Vis23Years,
+      norge47Sites3Years, norge47Sites163Years, norge66Sites163Years, norge100Sites163Years, norge140Sites163Years, norge200Sites163Years, norge50Sites16Vis23Years,
+     file = "survey_calc3Years.Rdata")
+ 
+```
+```{r}
+load("survey_calc3Years.Rdata")
+```
+
+
+```{r makeSurveTable3years}
+
+surTab3years <- tibble("Areal" = rep(c("Norge",
+                             "Oslo",
+                             "Bergen",
+                             "Trondheim"), times = 6),
+                 "Antall lokaliteter per år" = rep(c(47,
+                                          66,
+                                          100,
+                                          140,
+                                          200,
+                                          50), each = 4),
+                  "Antall lokaliteter totalt" = rep(c(47*3,
+                                          66*3,
+                                          100*3,
+                                          140*3,
+                                          200*3,
+                                          50*3), each = 4),
+                 "Antall besøk" = rep(c(1*2,
+                                       1*2,
+                                       1*2,
+                                       1*2,
+                                       1*2,
+                                       2*2), each = 4),
+                 "Deteksjonsrate 250x250m" = rep(c(0.426,
+                                                   0.426 * 1.5,
+                                                   0.426,
+                                                   0.426*1.5,
+                                                   0.426,
+                                                   0.426*1.5), each = 4))
+
+                 
+
+
+
+
+
+surTab3years <- surTab3years %>% 
+  mutate("Deteksjonerate 1x1km" = `Deteksjonsrate 250x250m` /16 * `Antall besøk`,
+    "Oppdagbarhet" = c(norge47Sites163Years$probObs, oslo47Sites163Years$probObs, bergen47Sites163Years$probObs, trondheim47Sites163Years$probObs,
+                            norge66Sites163Years$probObs, oslo66Sites163Years$probObs, bergen66Sites163Years$probObs, trondheim66Sites163Years$probObs,
+                            norge100Sites163Years$probObs, oslo100Sites163Years$probObs, bergen100Sites163Years$probObs, trondheim100Sites163Years$probObs,
+                            norge140Sites163Years$probObs, oslo140Sites163Years$probObs, bergen140Sites163Years$probObs, trondheim140Sites163Years$probObs,
+                            norge200Sites163Years$probObs, oslo200Sites163Years$probObs, bergen200Sites163Years$probObs, trondheim200Sites163Years$probObs,
+                            norge50Sites16Vis23Years$probObs, oslo50Sites16Vis23Years$probObs, bergen50Sites16Vis23Years$probObs, trondheim50Sites16Vis23Years$probObs
+                                    ))
+
+#surTab
+
+```
+\blandscape
+
+```{r surTab3years, results = "asis"}
+
+xtable(surTab3years, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 year period visiting each location 2 years.")
+```
+\elandscape
 
 Calculate the number of locations and visits needed given the empirical detection rates.
 
 
-```{r calcLocationsNeeded, eval = T}
+```{r calcLocationsNeeded, eval = F}
 
 norgeDet0.426Vis1 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.426/16,
                   nIter = 999,
                   noVisits = 1)
@@ -1108,7 +1755,7 @@ norgeDet0.426Vis1 <- weightedDetection(occWeights = occWeights,
 norgeDet0.426Vis4 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.426/16*4,
                   nIter = 999,
                   noVisits = 1)
@@ -1116,7 +1763,7 @@ norgeDet0.426Vis4 <- weightedDetection(occWeights = occWeights,
 norgeDet0.426Vis10 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.426/16*10,
                   nIter = 999,
                   noVisits = 1)
@@ -1124,7 +1771,7 @@ norgeDet0.426Vis10 <- weightedDetection(occWeights = occWeights,
 norgeDet0.639Vis1 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.639/16,
                   nIter = 999,
                   noVisits = 1)
@@ -1132,7 +1779,7 @@ norgeDet0.639Vis1 <- weightedDetection(occWeights = occWeights,
 norgeDet0.639Vis4 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.639/16*4,
                   nIter = 999,
                   noVisits = 1)
@@ -1140,16 +1787,52 @@ norgeDet0.639Vis4 <- weightedDetection(occWeights = occWeights,
 norgeDet0.639Vis10 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
                   noOccur = 500,
-                  noLocations = seq(50, 1000, by = 50),
+                  noLocations = seq(100, 1000, by = 100),
                   detectProb = 0.639/16*10,
                   nIter = 999,
                   noVisits = 1)
 
 
-save(norgeDet0.426Vis1, norgeDet0.426Vis4, norgeDet0.426Vis10, norgeDet0.639Vis1, norgeDet0.639Vis4, norgeDet0.639Vis01, file = "neededLocEmp.Rdata")
+save(norgeDet0.426Vis1, norgeDet0.426Vis4, norgeDet0.426Vis10, norgeDet0.639Vis1, norgeDet0.639Vis4, norgeDet0.639Vis10, file = "neededLocEmp.Rdata")
 ```
 ```{r}
 load("neededLocEmp.Rdata")
+```
+
+```{r norgeDet0.426Vis1, fig.cap = "Observation probability given a detection probability of 0.426 with 1 visit to a 1/16 part of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.426Vis1, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
+```
+```{r norgeDet0.426Vis4, fig.cap = "Observation probability given a detection probability of 0.426 with 1 visits to 4 1/16 parts of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.426Vis4, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
+```
+
+
+```{r norgeDet0.426Vis10, fig.cap = "Observation probability given a detection probability of 0.426 with 1 visits to 10 1/16 parts of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.426Vis10, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
+```
+
+```{r norgeDet0.639Vis1, fig.cap = "Observation probability given a detection probability of 0.639 with one visit to a 1/16 part of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.639Vis1, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
+```
+```{r norgeDet0.639Vis4, fig.cap = "Observation probability given a detection probability of 0.639 with one visit to 4 1/16 parts of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.639Vis4, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
+```
+
+
+```{r norgeDet0.639Vis10, fig.cap = "Observation probability given a detection probability of 0.639 with one visit to 10 1/16 parts of a 1km^2 cell. Sampling the whole country."}
+plot(norgeDet0.639Vis10, threshold = 0.8,
+     xlab = "Antall lokaliteter",
+     ylab = "Observasjonssannsynlighet")
 ```
 
 
