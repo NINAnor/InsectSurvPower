@@ -8,3 +8,5 @@
 "map10km"
 "map1km"
 "predWeights1km"
+"predWeights10km"
+

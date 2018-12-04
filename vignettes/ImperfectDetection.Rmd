@@ -4,11 +4,11 @@ author: "Jens Åström"
 date: "`r Sys.Date()`"
 output: 
   pdf_document:
-    keep_tex: true
     latex_engine: xelatex
     fig_caption: yes
     includes:
           in_header: header.tex
+bibliography: bibliography.bib
 ---
 
 
@@ -17,7 +17,10 @@ options(list("xtable.include.rownames" = F,
            "xtable.comment" = F))
 
 require(knitr)
-knitr::opts_chunk$set(echo = TRUE, tidy = T, dev = c("png", "pdf"), dev.args=list(family='Arial'), dpi = 600, fig.path = "figure/")
+knitr::opts_chunk$set(echo = TRUE, tidy = 'styler',
+                      dev = c("png", "pdf"), 
+                      dev.args=list(family='Arial'), 
+                      dpi = 600, fig.path = "figure/")
 require(extrafont)
 #loadfonts()
 
@@ -25,29 +28,29 @@ require(extrafont)
 
 Intro
 =============
-I here explore some effects of rare occurrence and imperfect detection in species observation and explore alternative survey regimes. This is mostly relevant for rare species, and not for the general survey of insects. Early detection of alien species is another use case.
+We here explore some effects of rare occurrences and imperfect detection in observation of species, and explore alternative survey regimes. This is mostly relevant for rare species, and not for the general survey of insects. A use case is early detection of alien species, which we explore a little deeper.
 
-The objective is to identify suitable sampling strategies for a couple of different scenarios, where we maximise the chances of detecting a species at least once while considering the economic costs. The basic principle here is that a species can be present in a sampling location with a given probability of occurrence. The observers then have a given chance (probability) of detecting a species on a visit, if it is present. The total probability of of detecting a species will be dependent on both the probability of occurrence and the probability of detection, how many locations are visited, and how many visits we make at each location.
+The objective here is to identify suitable sampling strategies for a couple of different scenarios, where we maximise the chances of detecting a species at least once while considering the economic costs. The basic principle here is that a species can be present in a sampling location with a given probability of occurrence. The observers then have a given chance (probability) of detecting a species on a visit, if it is present. The resulting probability of detecting a species will thus be dependent on both the probability of occurrence and the probability of detection, how many locations are visited, and how many visits we make at each location.
 
 
-If $\psi$ represents the occurrence probability and $\theta$ is the detection probability, the probability of observing the species at least once in $J$ locations visited $K$ times is: $$probObserv = 1 - (1 - \psi * (1 - (1 - \theta)^K))^J.$$ The costs can be assumed to scale roughly linearly to the total amount of visits, i.e. $totalCost = J * K * c$, where $c$ is the cost of one visit/survey.
+If $\psi$ represents the occurrence probability and $\theta$ is the detection probability, the probability of observing the species at least once in $J$ locations visited $K$ times is: $$probObserv = 1 - (1 - \psi * (1 - (1 - \theta)^K))^J.$$ To simplify, we here assume that the costs scale roughly linearly to the total amount of visits, i.e. $totalCost = J * K * c$, where $c$ is,the cost of one visit/survey.
 
 
 First look
 =========
 
-We can explore how the overall probability of observing the species, and the associated costs depend on $\psi, \theta, J, K, c$ graphically. I have made a convenience function `obsProb` to calculate the values. A lot of the results seem pretty obvious in retrospect, but it is still worth plotting them to get a better feel for the possibilities. At the moment, we only consider one and the same cost for each survey visit. It may be worth while to code up using a higher initial cost of the first visit, and lower costs for subsequent visits.
+We can explore how the overall probability of observing the species, and the associated costs depend on $\psi, \theta, J, K, c$ graphically. I have made a convenience function `obsProb` to calculate the values. A lot of the results seem pretty obvious in retrospect, but it is still worth plotting them to get a better feel for the possibilities. At the moment, we only consider one and the same cost for each survey visit. It may be worth while coding up using a higher initial cost of the first visit, and lower costs for subsequent visits, to account for the economics of scale.
 
 ```{r, results = 'hide', message = F}
-require(InsectSurvPower)
-##custom library, available through devtools::install_github("NINAnor/InsectSurvPower")
+require(SurveyPower)
+##custom library, available through devtools::install_github("NINAnor/SurveyPower")
 require(dplyr)
 require(gridExtra)
 require(ggplot2)
 require(xtable)
 ```
 
-We specify one or a range of values for occurrence probability in each location, detection probabilities, the number of locations visited, the number of visits per location, and the cost of each visit. To illustrate, we here use occurrence probabilities ranging from 0.01 to 1, two different detection probabilities as 0.5, and 0.8. We specify 30 locations, each visited 4 times, at an individual visit cost of 5000.
+We can specify a single or a range of values for the occurrence probability in each location, the detection probabilities, the number of locations visited, the number of visits per location, and the cost of each visit. To illustrate, we here use occurrence probabilities ranging from 0.01 to 1, two different detection probabilities as 0.5, and 0.8. We specify 30 locations, each visited 4 times, at an individual visit cost of 5000.
 
 ```{r}
 obsDf <- obsProb(occProb = seq(0.01, 1, by = 0.05),
@@ -59,7 +62,7 @@ obsDf <- obsProb(occProb = seq(0.01, 1, by = 0.05),
 obsDf
 
 ```
-The probability of observing the species at least once is found in the `obsProb` column, and the total cost in the column `totCost`. The function returns an object of a specific class with a custom plotting function. This makes repeated plottings easier. We can specify a grouping variable to split up the lines.
+The probability of observing the species at least once is found in the `obsProb` column, and the total cost in the column `totCost`. The function returns an object of a specific class with a custom plotting function (see figure \ref{princPlot}). This makes repeated plottings easier. We can specify a grouping variable to split up the lines.
 
 ```{r princPlot, fig.cap = "Observation probability for surveying a species with a detection probability of 0.5 in 30 locations, each visited 4 times. \\label{princPlot}"}
 plot(obsDf, group = "detectProb",
@@ -147,9 +150,9 @@ plot(rareCostDf, group = "locations",
 <!-- ``` -->
 
 
-Some strategies
+Sampling strategies
 ==============
-As seen in figure \ref{lowOccurrPlot}, when we deal with a very rare species, it is little use increasing the number of visits to each location (or to spend money maximizing the detection probability), if we can't at the same time span a very large number of locations. We must in these cases concentrate on increasing the number of visited locations. Still, for a very rare species such as displayed in figure \ref{lowOccurrPlot}, with an occurrence probability of 0.01%, reaching an overall observation probability of 80% requires more at least 1650 locations, which would be unfeasible for most survey programs. 
+When we deal with a very rare species, it is little use increasing the number of visits to each location (or to spend money maximizing the detection probability), if we only visit a few locations. In these cases, we have to cover a very large number of locations, just to have a chance of visiting a location with a presence (figure \ref{lowOccurrPlot}). Still, for a very rare species such as displayed in figure \ref{lowOccurrPlot}, with an occurrence probability of 0.01%, reaching an overall observation probability of 80% requires more at least 1650 locations, which would be unfeasible for most survey programs. 
 
 Alternatively, if detectability is low but presence is relatively high, we should focus on increasing the number of revisits per location, instead of trying to cover many locations (figure \ref{lowDetectPlot}).
 
@@ -195,9 +198,9 @@ plot(lowDetectDf, group = "visits",
 
 ```
 
-Plausible values
-============
-It is difficult to guess plausible values for occurrence and detectability for real world species, but it is reasonable to assume that we only have to consider rather low occurrence probabilities, since we are working on early detections. We can explore our possibilities of observing a species that occurr in between 0.1 to 1% of all studied locations. We can set the number of locations to 100 and with two visits, as a reasonable possibility.
+Plausible values for early detection of alien species.
+-------------
+If we deal with for example early detection of alien species, it is reasonable to assume that we only have to consider rather low occurrence probabilities. We can explore our possibilities of observing a species that occurr in between 0.1 to 1% of all studied locations. For detection probabilities, we choose a range of expected, while hopeful, values. We her set the number of locations to 100 and with two visits, as a reasonable setup to complete within a year.
 
 ```{r}
 
@@ -242,10 +245,9 @@ plot(guessDf, group = "detectProb",
 
 Unequally distributed probabilities
 ==================
-** There is no definition for early detection. The earlier we want to detect (no occurrences is low) the more costly to detect. We can use the alien/native map as a relative risk map and use that to "model" a weighted occurrence map. This we visit in a weighted fashion as well, a number of times. Need to work out the math. We can then calculate the costs for different number of alien occurrences.**
+So far, we have only considered equally distributed probabilities for occurrences, meaning that every grid cell has equal probability of containing an occurrence. In the equation $probObserv = (1 - (1 - \psi)^J) * (1 - (1 - \theta)^K))$, $\psi$ designates the probability that a site we visit contains a certain species. This is the parameter which up until now have been the same for all sites. This is not such a good model for many real world situations. Often we have some knowledge, or at least guesses of where a species is more likely to be present. Therefore, the probability that a specific site that you visit contains a certain species will vary between sites. It will depend both on the probability of a site containing a species, and the probability that you visit that site. 
 
-
-In the equation $probObserv = (1 - (1 - \psi)^J) * (1 - (1 - \theta)^K))$, $\psi$ designates the probability that a site we visit contains a certain species. So far, we have only considered situations where the occurrence probabilities ($\psi$) are the same for all sites. In reality, however, the probability that a specific site that you visit contains a certain species will vary between sites. It will depend both on the probability of a site containing a species, and the probability that you visit that site. We can view the probability of a specific site containing a species as a weighted sampling without replacement. For example, if we know there are a 100 sites containing species x, we can calculate the probability that each site contains species x if we know the probability weights. This probability can be written, following Eframidis & Spirakis 2006,as $p_i(k) = \frac{w_i} {\sum_{S_j \in V - S} {w_j}}$. For brevity, however, we will simply designate this probability as $Pr[w_i, n]$, where the weights $w_i$ sums to 1, and $n$ is the number of sites with the species. Similarly, we choose which sites to visit as a sampling without replacement, so that the probability of visiting a site $i$ is $Pr[u_i, v]$, where $u_i$ is the visitation weights, which sums to 1, and $v$ is the number of sites you visit. The probability of visiting a site with an alien species then becomes $\psi_i =  Pr[w_i, n] * Pr[u_i, v]$, and the probability of visiting any location inhabited by an alien species is $PoccurrVisit = (1 -  \prod_{i}^{}(1 - (Pr[w_i, n] * Pr[u_i, v])))$. 
+We can view the probability of a specific site containing a species as a weighted sampling without replacement. For example, if we know there are a 100 sites containing species x, we can calculate the probability that each site contains species x if we know the probability weights. This probability can be written, following @Efraimidis_2006, as $p_i(k) = \frac{w_i} {\sum_{S_j \in V - S} {w_j}}$. For brevity, however, we will simply designate this probability as $Pr[w_i, n]$, where the weights $w_i$ sums to 1, and $n$ is the number of sites with the species. Similarly, we choose which sites to visit as a sampling without replacement, so that the probability of visiting a site $i$ is $Pr[u_i, v]$, where $u_i$ is the visitation weights, which sums to 1, and $v$ is the number of sites you visit. The probability of visiting a site with an alien species then becomes $\psi_i =  Pr[w_i, n] * Pr[u_i, v]$, and the probability of visiting any location inhabited by an alien species is $PoccurrVisit = (1 -  \prod_{i}^{}(1 - (Pr[w_i, n] * Pr[u_i, v])))$. 
 
 For simplicity, we can assume that the probability of detection is equal for each site and visit. The probability of detecting an alien species is then $Pdetect = (1 -  \prod_{i}^{}(1 - (Pr[w_i, n] * Pr[u_i, v]))) * (1 - (1 - d)^K$, where d is the detection probability, and K is again the number of visits per site.
 
@@ -259,7 +261,7 @@ So far, the best estimate for the occurrence weights are the occurrence modellin
 
 To get test it out, we can use the 10km scale, which isn't so resource intensive. The 1km scale isn't really interactive since it takes to long time to calculate. 
 
-```{r, include = F}
+```{r, include = F, eval = F}
 require(RPostgreSQL)
 require(DBI)
 require(rpostgis)
@@ -291,26 +293,29 @@ plot(predMap["pred"],
 
 ```
 
-For now, we get rid of the geometry column to increase speed.
 
-```{r}
-predWeights <- predMap %>% 
+```{r, include = F, eval = F}
+predWeights10km <- predMap %>% 
   select(sites = ssbid,
          weights = pred) %>% 
   sf::st_set_geometry(NULL)
+devtools::use_data(predWeights10km)
 ```
 
+```{r}
+data(predWeights10km)
+```
 
 But we start with a situation where the occupied patches are distributed randomly, and we visit the sites randomly. In other words, where the occurrence and visitation weights all are equal.
 
 
 ```{r}
-predWeightsZero<- predWeights
+predWeightsZero<- predWeights10km
 predWeightsZero$weights <- 1
 
 
 system.time(predProb50Zero <- weightedDetection(occWeights = predWeightsZero,
-                              visWeights = predWeights,
+                              visWeights = predWeights10km,
                               noOccur = 5,
                               noLocations = seq(50, 200, by = 50),
                               noVisits = 1,
@@ -357,8 +362,8 @@ But what happens when we have information about the occurence of the species? In
 
 ```{r, fig.cap = "Probability of observing"}
 
-system.time(predProb <- weightedDetection(occWeights = predWeights,
-                              visWeights = predWeights,
+system.time(predProb <- weightedDetection(occWeights = predWeights10km,
+                              visWeights = predWeights10km,
                               noOccur = 5,
                               noLocations = seq(50, 200, by = 50),
                               noVisits = 1,
@@ -378,17 +383,16 @@ We then reach quite high probabilities for observing the species. This of course
 
 ```{r}
 
-hist(predWeights$weights)
+hist(predWeights10km$weights)
 
 ```
-
 
 
 
 Calculations based on 1km map
 ----------------
 
-```{r, eval = F}
+```{r, include = F, eval = F}
 require(RPostgreSQL)
 require(DBI)
 require(rpostgis)
@@ -420,7 +424,7 @@ predMap1km$pred[is.na(predMap1km$pred)] <- 0
 
 ```
 
-```{r, eval = F}
+```{r, include = F, eval = F}
 predWeights1km <- predMap1km %>% 
   select(sites = ssbid,
          weights = pred) %>% 
@@ -440,6 +444,23 @@ It is reasonable to assume that we won't reach a higher detection probability th
 
 
 
+```{r, include = F, eval = F}
+#collect a bunch of small files into one
+predFiles <- list.files(pattern = "pred*")
+lapply(predFiles, load, .GlobalEnv)
+
+predObjectsToStore <-grep("predOcc*", ls(), value = T)
+save(list = predObjectsToStore, file = "predOccs.Rdata")
+```
+
+
+```{r, include = F}
+
+data(predOccs)
+```
+
+
+
 ```{r, eval = F}
 
 system.time(predOcc500Det0.8 <- weightedDetection(occWeights = predWeights1km,
@@ -455,8 +476,6 @@ save(predOcc500Det0.8, file = "predOcc500Det0.8.Rdata")
 
 ```
 ```{r}
-
-load(file = "predOcc500Det0.8.Rdata")
 predOcc500Det0.8
 ```
 ```{r predOcc500Det0.8, fig.cap = "Estimated observation probability of an alien vascular plant species occurring in 500 1x1km grid cells as a function of the number of visited locations. Occurrences and location selection is based on the same weights, modelled from actual alien vascular plant species occurrences. Each visit has a 0.8 probability of detecting the species if present. The threshold of the desired observation probabilitiy of 0.8 is shown as a dashed line. \\label{predOcc500Det0.8} "}
@@ -486,7 +505,7 @@ save(predOcc200Det0.8, file = "predOcc200Det0.8.Rdata")
 ```
 ```{r, results = "asis"}
 
-load(file = "predOcc200Det0.8.Rdata")
+
 xtable(predOcc200Det0.8)
 ```
 
@@ -516,7 +535,6 @@ save(predOcc100Det0.8, file = "predOcc100Det0.8.Rdata")
 ```
 ```{r, results = "asis"}
 
-load(file = "predOcc100Det0.8.Rdata")
 
 xtable(predOcc100Det0.8)
 ```
@@ -536,19 +554,6 @@ Surveying 250x250m squares
 -------------
 In practice, it can be challenging to survey even a 1x1km grid with any respectable observation probability. We might therefore subdivide the squares in smaller units, with the result that our detection probability decreases from simply not covering the place where the species occupies. If a species just occurs in one out of 16 250x250 squares within a 1x1km square and we visit only one such smaller square, our detection probability drops to 1/16 of the former level. How much the detection probability drops of course depend on the aggregation pattern of the species, i.e. how much of the 1x1km cell it is present in. On a tangent, the number of occurrences we consider to be acceptable within an "early detection" framework depends on the scale of the grid cells considered, and the way that the species are aggregated. 500 out of ca 50 000 1x1km cells constitutes occurrences in 1% of the cells. If we accept a 1% occurrence in the about 800 000 250x250 cells, that amounts to 8000 occurrences. As long as these are not extremy aggregated, this could hardly be seen as an early establishment phase.
 
-
-```{r}
-load("predOcc500Det0.05.Rdata")
-load("predOcc500Det0.05Vis4.Rdata")
-load("predOcc500Det0.05Vis10.Rdata")
-load("predOcc500Det0.025Vis4.Rdata")
-load("predOcc500Det0.025Vis10.Rdata")
-load("predOcc100Det0.05Vis10.Rdata")
-load("predOcc100Det0.05Vis4.Rdata")
-load("predOcc100Det0.05Vis1.Rdata")
-load("predOcc500Det0.2.Rdata")
-load("predOcc500Det0.5.Rdata")
-```
 
 Case of 500 1x1km cells occupied, but we survey only 250x250m subsquares
 ---------------
@@ -632,6 +637,21 @@ One strategy is to limit the surveyed areas to focus the efforts. We may thereby
 
 This situation can be modelled using the same function `weightedDetection`, by setting the visitation probability to zero for the locations outside our focus area. Based on the prediction map, I have selected a set of kommunes around Oslo that seems to encompass the areas with highest predictions.
 
+
+
+```{r, include = F, eval = F}
+surveyFiles <- list.files(pattern = "survey*")
+lapply(surveyFiles, load, .GlobalEnv)
+
+surveyFilesToSave <- grep("*Sites*", ls(), value = T)
+surveyFilesToSave
+
+save(list = surveyFilesToSave, file = "surveyCalc.Rdata")
+```
+
+```{r}
+data(surveyCalc)
+```
 
 Oslo region
 ---------
@@ -787,7 +807,7 @@ summary(occWeights$weights)
 
 
 Run calculations
-```{r run_survey_calc, eval = F}
+```{r run_survey_calc, include = F, eval = F}
 oslo47Sites <- weightedDetection(occWeights = occWeights,
                   visWeights = osloVisWeights,
                   noOccur = 500,
@@ -1040,9 +1060,7 @@ save(oslo47Sites, oslo47Sites16, oslo66Sites16, oslo100Sites16, oslo140Sites16, 
  
 ```
 
-```{r}
-load(file = "survey_calc.Rdata")
-```
+
 
 ```{r makeSurveTable}
 
@@ -1103,7 +1121,7 @@ Calculate the same for 6 year period (cannot split 5 years in two, for the alter
 
 
 Run calculations for 6 years.
-```{r run_survey_calc6years, eval = T}
+```{r run_survey_calc6years, eval = F}
 oslo47Sites6Years <- weightedDetection(occWeights = occWeights,
                   visWeights = osloVisWeights,
                   noOccur = 500,
@@ -1356,9 +1374,6 @@ save(oslo47Sites6Years, oslo47Sites166Years, oslo66Sites166Years, oslo100Sites16
  
 ```
 
-```{r}
-load("survey_calc6years.Rdata")
-```
 
 
 ```{r makeSurveTable6years}
@@ -1423,7 +1438,7 @@ xtable(surTab6Years, caption = "Detection probabilities of a handful of survey r
 Calculate the same but where we revisit each location 2 times. With 47 lokations per year, this gives us in total 47*3 = 141 locations but double the area covered within the same location. We can also measure the spread of known distibutions between the 3 years.
 
 
-```{r run_survey_calc3years, eval = T}
+```{r run_survey_calc3years, eval = F, include = F}
 oslo47Sites3Years <- weightedDetection(occWeights = occWeights,
                   visWeights = osloVisWeights,
                   noOccur = 500,
@@ -1675,9 +1690,6 @@ save(oslo47Sites3Years, oslo47Sites163Years, oslo66Sites163Years, oslo100Sites16
      file = "survey_calc3Years.Rdata")
  
 ```
-```{r}
-load("survey_calc3Years.Rdata")
-```
 
 
 ```{r makeSurveTable3years}
@@ -1741,7 +1753,7 @@ xtable(surTab3years, caption = "Detection probabilities of a handful of survey r
 Calculate the number of locations and visits needed given the empirical detection rates.
 
 
-```{r calcLocationsNeeded, eval = F}
+```{r calcLocationsNeeded, include = F, eval = F}
 
 norgeDet0.426Vis1 <- weightedDetection(occWeights = occWeights,
                   visWeights = occWeights,
@@ -1796,7 +1808,7 @@ norgeDet0.639Vis10 <- weightedDetection(occWeights = occWeights,
 save(norgeDet0.426Vis1, norgeDet0.426Vis4, norgeDet0.426Vis10, norgeDet0.639Vis1, norgeDet0.639Vis4, norgeDet0.639Vis10, file = "neededLocEmp.Rdata")
 ```
 ```{r}
-load("neededLocEmp.Rdata")
+data(neededLocEmp)
 ```
 
 ```{r norgeDet0.426Vis1, fig.cap = "Observation probability given a detection probability of 0.426 with 1 visit to a 1/16 part of a 1km^2 cell. Sampling the whole country."}
@@ -1835,9 +1847,8 @@ plot(norgeDet0.639Vis10, threshold = 0.8,
      ylab = "Observasjonssannsynlighet")
 ```
 
+\clearpage
 
 References
 ========
-
-Pavlos S. Efraimidis, Paul G. Spirakis, Weighted random sampling with a reservoir, Information Processing Letters, Volume 97, Issue 5, 16 March 2006, Pages 181-185, ISSN 0020-0190, 10.1016/j.ipl.2005.11.003.
 
