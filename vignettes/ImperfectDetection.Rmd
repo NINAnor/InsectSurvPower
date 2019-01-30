@@ -18,7 +18,7 @@ options(list("xtable.include.rownames" = F,
 
 require(knitr)
 knitr::opts_chunk$set(echo = TRUE, tidy = 'styler',
-                      dev = c("png", "pdf"), 
+                      dev = c("png", "pdf", "svg"), 
                       dev.args=list(family='Arial'), 
                       dpi = 600, fig.path = "figure/")
 require(extrafont)
@@ -56,7 +56,7 @@ We can specify a single or a range of values for the occurrence probability in e
 obsDf <- obsProb(occProb = seq(0.01, 1, by = 0.05),
                     detectProb = c(0.5, 0.8),
                     locations = 30,
-                    visits =  4,
+                    visits =  1,
                     visitCost = 5000)
 
 obsDf
@@ -444,6 +444,75 @@ It is reasonable to assume that we won't reach a higher detection probability th
 
 
 
+
+```{r, eval = T, include = F}
+data(predOccs)
+```
+
+```{r calc_predOccs, eval = F, include = F}
+predOcc500Det0.05 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.8/16,
+                              nIter = 999)
+
+
+predOcc100Det0.8 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(50, 600, by = 50),
+                              noVisits = 1,
+                              detectProb = 0.8,
+                              nIter = 999)
+
+
+predOcc500Det0.8 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(50, 300, by = 50),
+                              noVisits = 1,
+                              detectProb = 0.8,
+                              nIter = 999)
+
+
+
+predOcc200Det0.8 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 200,
+                              noLocations = seq(50, 600, by = 50),
+                              noVisits = 1,
+                              detectProb = 0.8,
+                              nIter = 999)
+
+predOcc100Det0.05Vis1 <-  weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 100,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.8/16,
+                              nIter = 999)
+
+predOcc500Det0.5 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.8/16*10,
+                              nIter = 999)
+predOcc500Det0.2 <- weightedDetection(occWeights = predWeights1km,
+                              visWeights = predWeights1km,
+                              noOccur = 500,
+                              noLocations = seq(200, 1000, by = 200),
+                              noVisits = 1,
+                              detectProb = 0.8/16*4,
+                              nIter = 999)
+
+save(predOcc500Det0.05, predOcc100Det0.8, predOcc500Det0.8, predOcc200Det0.8, predOcc100Det0.05Vis1, predOcc500Det0.5, predOcc500Det0.2, file = "pred_occs.Rdata")
+
+```
+
 ```{r, include = F, eval = F}
 #collect a bunch of small files into one
 predFiles <- list.files(pattern = "pred*")
@@ -454,30 +523,6 @@ save(list = predObjectsToStore, file = "predOccs.Rdata")
 ```
 
 
-```{r, include = F}
-
-data(predOccs)
-```
-
-
-
-```{r, eval = F}
-
-system.time(predOcc500Det0.8 <- weightedDetection(occWeights = predWeights1km,
-                              visWeights = predWeights1km,
-                              noOccur = 500,
-                              noLocations = seq(50, 300, by = 50),
-                              noVisits = 1,
-                              detectProb = 0.8,
-                              nIter = 999))
-
-save(predOcc500Det0.8, file = "predOcc500Det0.8.Rdata")
-
-
-```
-```{r}
-predOcc500Det0.8
-```
 ```{r predOcc500Det0.8, fig.cap = "Estimated observation probability of an alien vascular plant species occurring in 500 1x1km grid cells as a function of the number of visited locations. Occurrences and location selection is based on the same weights, modelled from actual alien vascular plant species occurrences. Each visit has a 0.8 probability of detecting the species if present. The threshold of the desired observation probabilitiy of 0.8 is shown as a dashed line. \\label{predOcc500Det0.8} "}
 
 plot(predOcc500Det0.8,
@@ -489,23 +534,7 @@ plot(predOcc500Det0.8,
 So for the case of 500 occupied cells, we reach the target observation probability after visiting about 200 sites. In similar fashion, we can explore the case with 200 and 100 occupied cells, respectively.
 
 
-```{r, eval = F}
-
-system.time(predOcc200Det0.8 <- weightedDetection(occWeights = predWeights1km,
-                              visWeights = predWeights1km,
-                              noOccur = 200,
-                              noLocations = seq(50, 600, by = 50),
-                              noVisits = 1,
-                              detectProb = 0.8,
-                              nIter = 999))
-
-save(predOcc200Det0.8, file = "predOcc200Det0.8.Rdata")
-
-
-```
 ```{r, results = "asis"}
-
-
 xtable(predOcc200Det0.8)
 ```
 
@@ -517,22 +546,6 @@ plot(predOcc200Det0.8,
      ylab = "Observasjonssannsynlighet")
 ```
 
-
-
-```{r, eval = F}
-
-system.time(predOcc100Det0.8 <- weightedDetection(occWeights = predWeights1km,
-                              visWeights = predWeights1km,
-                              noOccur = 100,
-                              noLocations = seq(50, 600, by = 50),
-                              noVisits = 1,
-                              detectProb = 0.8,
-                              nIter = 999))
-
-save(predOcc100Det0.8, file = "predOcc100Det0.8.Rdata")
-
-
-```
 ```{r, results = "asis"}
 
 
@@ -545,10 +558,7 @@ plot(predOcc100Det0.8,
 ```
 In the case of 200 occupied cells, we reach an overall observation probability of 0.8 after about 500 visited sites with an observation probability of 0.8. With only 100 occupied cells, we don't reach the target of 0.8 even after 600 visited locations.  
 
-
 We can see the effect of a lower detection probability.
-
-
 
 Surveying 250x250m squares
 -------------
@@ -558,6 +568,7 @@ In practice, it can be challenging to survey even a 1x1km grid with any respecta
 Case of 500 1x1km cells occupied, but we survey only 250x250m subsquares
 ---------------
 We start with the case of 500 occurrences spread out in the 50 000 1x1km cells, but when we visit just a 16th of these cells once.
+
 
 ```{r predOcc500Det0.05, fig.cap = "Probability of detecting a species at least once that is present in 500 of the 1x1km cells, but we survey only a 1/16 of the cell."}
 plot(predOcc500Det0.05,
@@ -639,17 +650,7 @@ This situation can be modelled using the same function `weightedDetection`, by s
 
 
 
-```{r, include = F, eval = F}
-surveyFiles <- list.files(pattern = "survey*")
-lapply(surveyFiles, load, .GlobalEnv)
-
-surveyFilesToSave <- grep("*Sites*", ls(), value = T)
-surveyFilesToSave
-
-save(list = surveyFilesToSave, file = "surveyCalc.Rdata")
-```
-
-```{r}
+```{r, eval = F}
 data(surveyCalc)
 ```
 
@@ -712,7 +713,8 @@ osloAreaKommuneNr <- c("0211",
 ssbidToVisit <- map1km %>% 
   filter(KOMMUNENUMMER %in% osloAreaKommuneNr) %>% 
   select(ssbid, kommune)
-
+```
+```{r osloKommune, fig.cap = "Included kommunes in Oslo area calculation"}
 
 plot(ssbidToVisit["kommune"], key.width =  lcm(4), key.pos = 4,
      border = 0)
@@ -756,6 +758,9 @@ ssbidBergen <- map1km %>%
   filter(KOMMUNENUMMER %in% bergenKommuneNr) %>% 
   select(ssbid, kommune)
 
+```
+
+```{r bergenKommune, fig.cap = "Included kommunes in Bergen area calculation"}
 
 plot(ssbidBergen["kommune"], key.width =  lcm(4), key.pos = 4,
      border = 0)
@@ -791,6 +796,9 @@ ssbidTrondheim <- map1km %>%
   filter(KOMMUNENUMMER %in% trondheimKommuneNr) %>% 
   select(ssbid, kommune)
 
+```
+
+```{r trondheimKommune,  fig.cap = "Included kommunes in Trondheim area calculation"}
 
 plot(ssbidTrondheim["kommune"], 
      key.width =  lcm(4), key.pos = 4,
@@ -805,6 +813,54 @@ summary(trondheimVisWeights$weights)
 summary(occWeights$weights)
 ```
 
+Stavanger
+------------
+
+
+```{r}
+occWeights <- predWeights1km
+
+stavangerArea <- c("Hå",
+                   "Time",
+                   "Sandnes",
+                   "Randaberg",
+                   "Stavanger",
+                   "Sola",
+                   "Klepp"
+              )
+
+stavangerAreaKommuneNr <- c("1119",
+                       "1121",
+                       "1102",
+                       "1127",
+                       "1103",
+                       "1124",
+                       "1120"
+                       )
+
+ssbidToVisit <- map1km %>% 
+  filter(KOMMUNENUMMER %in% stavangerAreaKommuneNr) %>% 
+  select(ssbid, kommune)
+
+```
+
+```{r stavangerKommune,  fig.cap = "Included kommunes in Stavanger area calculation"}
+
+
+plot(ssbidToVisit["kommune"], key.width =  lcm(4), key.pos = 4,
+     border = 0)
+```
+
+
+
+```{r}
+stavangerVisWeights <- occWeights
+stavangerVisWeights$weights[!(stavangerVisWeights$sites %in% ssbidToVisit$ssbid)] <- 0
+summary(stavangerVisWeights$weights)
+
+sum(stavangerVisWeights$weights >0)
+
+```
 
 Run calculations
 ```{r run_survey_calc, include = F, eval = F}
@@ -1061,31 +1117,112 @@ save(oslo47Sites, oslo47Sites16, oslo66Sites16, oslo100Sites16, oslo140Sites16, 
 ```
 
 
+```{r stavanger_calc, eval = F, include = F}
+stavanger47Sites <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger47Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger100Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 100,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+stavanger66Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 66,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger200Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 200,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger140Sites16 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 140,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger50Sites16Vis2 <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 50,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+save(stavanger47Sites, stavanger47Sites16, stavanger100Sites16, stavanger66Sites16, stavanger200Sites16, stavanger140Sites16, stavanger50Sites16Vis2, file = "survey_calc_stavanger.Rdata")
+
+
+```
+
+
+
+```{r, include = F, eval = F}
+surveyFiles <- list.files(pattern = "survey_calc*")
+lapply(surveyFiles, load, .GlobalEnv)
+
+surveyFilesToSave <- grep("*Sites*", ls(), value = T)
+surveyFilesToSave
+
+save(list = surveyFilesToSave, file = "surveyCalc.Rdata")
+```
+
+```{r}
+data(surveyCalc)
+```
+
+
 
 ```{r makeSurveTable}
 
 surTab <- tibble("Areal" = rep(c("Norge",
                              "Oslo",
                              "Bergen",
-                             "Trondheim"), times = 6),
+                             "Trondheim",
+                             "Stavanger"), times = 6),
                  "Antall lokaliteter" = rep(c(47,
                                           66,
                                           100,
                                           140,
                                           200,
-                                          50), each = 4),
+                                          50), each = 5),
                  "Antall besøk" = rep(c(1,
                                        1,
                                        1,
                                        1,
                                        1,
-                                       2), each = 4),
+                                       2), each = 5),
                  "Deteksjonsrate 250x250m" = rep(c(0.426,
                                                    0.426 * 1.5,
                                                    0.426,
                                                    0.426*1.5,
                                                    0.426,
-                                                   0.426*1.5), each = 4))
+                                                   0.426*1.5), each = 5))
 
                  
 
@@ -1095,12 +1232,12 @@ surTab <- tibble("Areal" = rep(c("Norge",
 
 surTab <- surTab %>% 
   mutate("Deteksjonerate 1x1km" = `Deteksjonsrate 250x250m` /16 * `Antall besøk`,
-    "Oppdagbarhet" = c(norge47Sites16$probObs, oslo47Sites16$probObs, bergen47Sites16$probObs, trondheim47Sites16$probObs,
-                            norge66Sites16$probObs, oslo66Sites16$probObs, bergen66Sites16$probObs, trondheim66Sites16$probObs,
-                            norge100Sites16$probObs, oslo100Sites16$probObs, bergen100Sites16$probObs, trondheim100Sites16$probObs,
-                            norge140Sites16$probObs, oslo140Sites16$probObs, bergen140Sites16$probObs, trondheim140Sites16$probObs,
-                            norge200Sites16$probObs, oslo200Sites16$probObs, bergen200Sites16$probObs, trondheim200Sites16$probObs,
-                            norge50Sites16Vis2$probObs, oslo50Sites16Vis2$probObs, bergen50Sites16Vis2$probObs, trondheim50Sites16Vis2$probObs
+    "Oppdagbarhet" = c(norge47Sites16$probObs, oslo47Sites16$probObs, bergen47Sites16$probObs, trondheim47Sites16$probObs, stavanger47Sites16$probObs,
+                            norge66Sites16$probObs, oslo66Sites16$probObs, bergen66Sites16$probObs, trondheim66Sites16$probObs, stavanger66Sites16$probObs,
+                            norge100Sites16$probObs, oslo100Sites16$probObs, bergen100Sites16$probObs, trondheim100Sites16$probObs, stavanger100Sites16$probObs,
+                            norge140Sites16$probObs, oslo140Sites16$probObs, bergen140Sites16$probObs, trondheim140Sites16$probObs, stavanger140Sites16$probObs,
+                            norge200Sites16$probObs, oslo200Sites16$probObs, bergen200Sites16$probObs, trondheim200Sites16$probObs, stavanger200Sites16$probObs,
+                            norge50Sites16Vis2$probObs, oslo50Sites16Vis2$probObs, bergen50Sites16Vis2$probObs, trondheim50Sites16Vis2$probObs, stavanger50Sites16Vis2$probObs
                                     ))
 
 #surTab
@@ -1109,7 +1246,7 @@ surTab <- surTab %>%
 
 \blandscape
 
-```{r surTab, results = "asis"}
+```{r surTab, results = "asis", echo = F}
 
 xtable(surTab, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey.")
 ```
@@ -1121,7 +1258,7 @@ Calculate the same for 6 year period (cannot split 5 years in two, for the alter
 
 
 Run calculations for 6 years.
-```{r run_survey_calc6years, eval = F}
+```{r run_survey_calc6years, eval = F, include = F}
 oslo47Sites6Years <- weightedDetection(occWeights = occWeights,
                   visWeights = osloVisWeights,
                   noOccur = 500,
@@ -1375,37 +1512,105 @@ save(oslo47Sites6Years, oslo47Sites166Years, oslo66Sites166Years, oslo100Sites16
 ```
 
 
+```{r stavanger6years, eval = F, include = F}
+stavanger47Sites6Years <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger47Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger100Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*6,
+                  detectProb = 0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+stavanger66Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+#Not enough places with positive occurrence probabilities
+# stavanger200Sites166Years  <- weightedDetection(occWeights = occWeights,
+#                   visWeights = stavangerVisWeights,
+#                   noOccur = 500,
+#                   noLocations = 200*6,
+#                   detectProb = 0.426/16,
+#                   nIter = 999,
+#                   noVisits = 1)
+
+stavanger200Sites166Years <- tibble("noLocations" = 600, "probObs" = NA)
+
+stavanger140Sites166Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*6,
+                  detectProb = 0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger50Sites16Vis26Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*6,
+                  detectProb = 0.426*1.5/16*2,
+                  nIter = 999,
+                  noVisits = 1)
+
+save(stavanger47Sites6Years, stavanger47Sites166Years, stavanger66Sites166Years, stavanger100Sites166Years, stavanger140Sites166Years, stavanger200Sites166Years, stavanger50Sites16Vis26Years, file = "survey_calc6yearsStavanger.Rdata") 
+
+
+```
+
+
 
 ```{r makeSurveTable6years}
 
 surTab6Years <- tibble("Areal" = rep(c("Norge",
                              "Oslo",
                              "Bergen",
-                             "Trondheim"), times = 6),
+                             "Trondheim",
+                             "Stavanger"), times = 6),
                  "Antall lokaliteter per år" = rep(c(47,
                                           66,
                                           100,
                                           140,
                                           200,
-                                          50), each = 4),
+                                          50), each = 5),
                   "Antall lokaliteter totalt" = rep(c(47*6,
                                           66*6,
                                           100*6,
                                           140*6,
                                           200*6,
-                                          50*6), each = 4),
+                                          50*6), each = 5),
                  "Antall besøk" = rep(c(1,
                                        1,
                                        1,
                                        1,
                                        1,
-                                       2), each = 4),
+                                       2), each = 5),
                  "Deteksjonsrate 250x250m" = rep(c(0.426,
                                                    0.426 * 1.5,
                                                    0.426,
                                                    0.426*1.5,
                                                    0.426,
-                                                   0.426*1.5), each = 4))
+                                                   0.426*1.5), each = 5))
 
                  
 
@@ -1415,12 +1620,12 @@ surTab6Years <- tibble("Areal" = rep(c("Norge",
 
 surTab6Years <- surTab6Years %>% 
   mutate("Deteksjonerate 1x1km" = `Deteksjonsrate 250x250m` /16 * `Antall besøk`,
-    "Oppdagbarhet" = c(norge47Sites166Years$probObs, oslo47Sites166Years$probObs, bergen47Sites166Years$probObs, trondheim47Sites166Years$probObs,
-                            norge66Sites166Years$probObs, oslo66Sites166Years$probObs, bergen66Sites166Years$probObs, trondheim66Sites166Years$probObs,
-                            norge100Sites166Years$probObs, oslo100Sites166Years$probObs, bergen100Sites166Years$probObs, trondheim100Sites166Years$probObs,
-                            norge140Sites166Years$probObs, oslo140Sites166Years$probObs, bergen140Sites166Years$probObs, trondheim140Sites166Years$probObs,
-                            norge200Sites166Years$probObs, oslo200Sites166Years$probObs, bergen200Sites166Years$probObs, trondheim200Sites166Years$probObs,
-                            norge50Sites16Vis26Years$probObs, oslo50Sites16Vis26Years$probObs, bergen50Sites16Vis26Years$probObs, trondheim50Sites16Vis26Years$probObs
+    "Oppdagbarhet" = c(norge47Sites166Years$probObs, oslo47Sites166Years$probObs, bergen47Sites166Years$probObs, trondheim47Sites166Years$probObs, stavanger47Sites166Years$probObs,
+                            norge66Sites166Years$probObs, oslo66Sites166Years$probObs, bergen66Sites166Years$probObs, trondheim66Sites166Years$probObs, stavanger66Sites166Years$probObs,
+                            norge100Sites166Years$probObs, oslo100Sites166Years$probObs, bergen100Sites166Years$probObs, trondheim100Sites166Years$probObs, stavanger100Sites166Years$probObs,
+                            norge140Sites166Years$probObs, oslo140Sites166Years$probObs, bergen140Sites166Years$probObs, trondheim140Sites166Years$probObs, stavanger140Sites166Years$probObs,
+                            norge200Sites166Years$probObs, oslo200Sites166Years$probObs, bergen200Sites166Years$probObs, trondheim200Sites166Years$probObs, stavanger200Sites166Years$probObs,
+                            norge50Sites16Vis26Years$probObs, oslo50Sites16Vis26Years$probObs, bergen50Sites16Vis26Years$probObs, trondheim50Sites16Vis26Years$probObs, stavanger50Sites16Vis26Years$probObs
                                     ))
 
 #surTab
@@ -1429,7 +1634,7 @@ surTab6Years <- surTab6Years %>%
 
 \blandscape
 
-```{r surTab6years, results = "asis"}
+```{r surTab6years, results = "asis", echo = F}
 
 xtable(surTab6Years, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 years of surveying visiting each location only one year.")
 ```
@@ -1656,32 +1861,6 @@ norge50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
                   nIter = 999,
                   noVisits = 1)
 
-oslo50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
-                  visWeights = osloVisWeights,
-                  noOccur = 500,
-                  noLocations = 50*6,
-                  detectProb = 2*2*0.426*1.5/16,
-                  nIter = 999,
-                  noVisits = 1)
-
-
-bergen50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
-                  visWeights = bergenVisWeights,
-                  noOccur = 500,
-                  noLocations = 50*6,
-                  detectProb = 2*2*0.426*1.5/16,
-                  nIter = 999,
-                  noVisits = 1)
-
-
-trondheim50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
-                  visWeights = trondheimVisWeights,
-                  noOccur = 500,
-                  noLocations = 50*6,
-                  detectProb = 2*2*0.426*1.5/16,
-                  nIter = 999,
-                  noVisits = 1)
-
 
 save(oslo47Sites3Years, oslo47Sites163Years, oslo66Sites163Years, oslo100Sites163Years, oslo140Sites163Years, oslo200Sites163Years, oslo50Sites16Vis23Years,
      bergen47Sites3Years, bergen47Sites163Years, bergen66Sites163Years, bergen100Sites163Years, bergen140Sites163Years, bergen200Sites163Years, bergen50Sites16Vis23Years,
@@ -1691,37 +1870,103 @@ save(oslo47Sites3Years, oslo47Sites163Years, oslo66Sites163Years, oslo100Sites16
  
 ```
 
+```{r stavanger3years, eval = F, include = F}
+stavanger47Sites3Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger47Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 47*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger100Sites163Years  <- weightedDetection(occWeights =occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 100*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+stavanger66Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 66*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger200Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 200*3,
+                  detectProb = 2*0.426/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+stavanger140Sites163Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 140*3,
+                  detectProb = 2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+
+stavanger50Sites16Vis23Years  <- weightedDetection(occWeights = occWeights,
+                  visWeights = stavangerVisWeights,
+                  noOccur = 500,
+                  noLocations = 50*3,
+                  detectProb = 2*2*0.426*1.5/16,
+                  nIter = 999,
+                  noVisits = 1)
+
+
+save(stavanger47Sites3Years, stavanger47Sites163Years, stavanger100Sites163Years, stavanger66Sites163Years, stavanger200Sites163Years, stavanger140Sites163Years,  stavanger50Sites16Vis23Years, file = "survey_calc3YearsStavanger.Rdata")
+```
+
+
 
 ```{r makeSurveTable3years}
 
 surTab3years <- tibble("Areal" = rep(c("Norge",
                              "Oslo",
                              "Bergen",
-                             "Trondheim"), times = 6),
+                             "Trondheim",
+                             "Stavanger"), times = 6),
                  "Antall lokaliteter per år" = rep(c(47,
                                           66,
                                           100,
                                           140,
                                           200,
-                                          50), each = 4),
+                                          50), each = 5),
                   "Antall lokaliteter totalt" = rep(c(47*3,
                                           66*3,
                                           100*3,
                                           140*3,
                                           200*3,
-                                          50*3), each = 4),
+                                          50*3), each = 5),
                  "Antall besøk" = rep(c(1*2,
                                        1*2,
                                        1*2,
                                        1*2,
                                        1*2,
-                                       2*2), each = 4),
+                                       2*2), each = 5),
                  "Deteksjonsrate 250x250m" = rep(c(0.426,
                                                    0.426 * 1.5,
                                                    0.426,
                                                    0.426*1.5,
                                                    0.426,
-                                                   0.426*1.5), each = 4))
+                                                   0.426*1.5), each = 5))
 
                  
 
@@ -1731,12 +1976,12 @@ surTab3years <- tibble("Areal" = rep(c("Norge",
 
 surTab3years <- surTab3years %>% 
   mutate("Deteksjonerate 1x1km" = `Deteksjonsrate 250x250m` /16 * `Antall besøk`,
-    "Oppdagbarhet" = c(norge47Sites163Years$probObs, oslo47Sites163Years$probObs, bergen47Sites163Years$probObs, trondheim47Sites163Years$probObs,
-                            norge66Sites163Years$probObs, oslo66Sites163Years$probObs, bergen66Sites163Years$probObs, trondheim66Sites163Years$probObs,
-                            norge100Sites163Years$probObs, oslo100Sites163Years$probObs, bergen100Sites163Years$probObs, trondheim100Sites163Years$probObs,
-                            norge140Sites163Years$probObs, oslo140Sites163Years$probObs, bergen140Sites163Years$probObs, trondheim140Sites163Years$probObs,
-                            norge200Sites163Years$probObs, oslo200Sites163Years$probObs, bergen200Sites163Years$probObs, trondheim200Sites163Years$probObs,
-                            norge50Sites16Vis23Years$probObs, oslo50Sites16Vis23Years$probObs, bergen50Sites16Vis23Years$probObs, trondheim50Sites16Vis23Years$probObs
+    "Oppdagbarhet" = c(norge47Sites163Years$probObs, oslo47Sites163Years$probObs, bergen47Sites163Years$probObs, trondheim47Sites163Years$probObs, stavanger47Sites163Years$probObs,
+                            norge66Sites163Years$probObs, oslo66Sites163Years$probObs, bergen66Sites163Years$probObs, trondheim66Sites163Years$probObs, stavanger66Sites163Years$probObs,
+                            norge100Sites163Years$probObs, oslo100Sites163Years$probObs, bergen100Sites163Years$probObs, trondheim100Sites163Years$probObs, stavanger100Sites163Years$probObs,
+                            norge140Sites163Years$probObs, oslo140Sites163Years$probObs, bergen140Sites163Years$probObs, trondheim140Sites163Years$probObs, stavanger140Sites163Years$probObs,
+                            norge200Sites163Years$probObs, oslo200Sites163Years$probObs, bergen200Sites163Years$probObs, trondheim200Sites163Years$probObs, stavanger200Sites163Years$probObs,
+                            norge50Sites16Vis23Years$probObs, oslo50Sites16Vis23Years$probObs, bergen50Sites16Vis23Years$probObs, trondheim50Sites16Vis23Years$probObs, stavanger50Sites16Vis23Years$probObs
                                     ))
 
 #surTab
@@ -1744,7 +1989,7 @@ surTab3years <- surTab3years %>%
 ```
 \blandscape
 
-```{r surTab3years, results = "asis"}
+```{r surTab3years, results = "asis", echo = F}
 
 xtable(surTab3years, caption = "Detection probabilities of a handful of survey regimes, with detection probabilities from an empiric survey. 6 year period visiting each location 2 years.")
 ```
@@ -1807,7 +2052,7 @@ norgeDet0.639Vis10 <- weightedDetection(occWeights = occWeights,
 
 save(norgeDet0.426Vis1, norgeDet0.426Vis4, norgeDet0.426Vis10, norgeDet0.639Vis1, norgeDet0.639Vis4, norgeDet0.639Vis10, file = "neededLocEmp.Rdata")
 ```
-```{r}
+```{r, eval = F}
 data(neededLocEmp)
 ```
 
@@ -1848,6 +2093,32 @@ plot(norgeDet0.639Vis10, threshold = 0.8,
 ```
 
 \clearpage
+
+
+<!-- Tabort: -->
+
+<!-- ```{r} -->
+<!-- lowDetectDf <- obsProb(occProb = 0.01, -->
+<!--                     detectProb = 0.05, -->
+<!--                     locations = seq(200, 1000, by = 200), -->
+<!--                     visits =  1, -->
+<!--                     visitCost = 5000) -->
+
+<!-- lowDetectDf -->
+
+
+
+<!-- ``` -->
+
+<!-- ```{r lowDetectPlot, fig.cap = "Observation probability for surveying a cryptic species as function of sampled locations. \\label{lowDetectPlot}"} -->
+<!-- plot(lowDetectDf, group = "visits", -->
+<!--      xVar = "locations", -->
+<!--      yVar = "obsProb", -->
+<!--      titleVar = c("occProb", "detectProb"),  -->
+<!--      hline = 0.8) -->
+
+<!-- ``` -->
+
 
 References
 ========

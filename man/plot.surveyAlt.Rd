@@ -5,7 +5,8 @@
 \title{plotSurveyAlt}
 \usage{
 \method{plot}{surveyAlt}(df, grouping = "yearlyCapacity",
-  color = c("yearlyCapacity", "totSamples", "resampleTime"), allTicks = T)
+  color = c("yearlyCapacity", "totSamples", "resampleTime"),
+  allTicks = T)
 }
 \description{
 Plot function for

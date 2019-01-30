@@ -4,16 +4,17 @@
 \alias{createOccProb}
 \title{createOccProb}
 \usage{
-createOccProb(map, intercept = 0.5, formula = ~NULL, sigmaFylke = 0.1,
-  sigmaKommune = 0.1, sigmaGrid = 0, sigmaFylkeTrend = 0,
-  sigmaKommuneTrend = 0, artypeEff = c(Bebygd = 0, Samferdsel = 0,
-  `Fulldyrka jord` = 0, `Overflatedyrka jord` = 0, Innmarksbeite = 0, Skog = 0,
-  `Åpen fastmark` = 0, Myr = 0, Isbre = 0, Ferskvann = 0, Hav = 0, `Ikke
-  kartlagt` = 0), artypeTrend = c(Bebygd = 0, Samferdsel = 0, `Fulldyrka jord`
-  = 0, `Overflatedyrka jord` = 0, Innmarksbeite = 0, Skog = 0, `Åpen fastmark`
-  = 0, Myr = 0, Isbre = 0, Ferskvann = 0, Hav = 0, `Ikke kartlagt` = 0),
-  nYears = 5, interceptTrend = -0.05, sdInterceptTrend = 0,
-  sortFylke = T, sortKommune = T, sortGrid = T)
+createOccProb(map, intercept = 0.5, formula = ~NULL,
+  sigmaFylke = 0.1, sigmaKommune = 0.1, sigmaGrid = 0,
+  sigmaFylkeTrend = 0, sigmaKommuneTrend = 0, artypeEff = c(Bebygd =
+  0, Samferdsel = 0, `Fulldyrka jord` = 0, `Overflatedyrka jord` = 0,
+  Innmarksbeite = 0, Skog = 0, `Åpen fastmark` = 0, Myr = 0, Isbre = 0,
+  Ferskvann = 0, Hav = 0, `Ikke kartlagt` = 0), artypeTrend = c(Bebygd =
+  0, Samferdsel = 0, `Fulldyrka jord` = 0, `Overflatedyrka jord` = 0,
+  Innmarksbeite = 0, Skog = 0, `Åpen fastmark` = 0, Myr = 0, Isbre = 0,
+  Ferskvann = 0, Hav = 0, `Ikke kartlagt` = 0), nYears = 5,
+  interceptTrend = -0.05, sdInterceptTrend = 0, sortFylke = T,
+  sortKommune = T, sortGrid = T)
 }
 \arguments{
 \item{formula}{Not yet implemented}

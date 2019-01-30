@@ -7,13 +7,14 @@
 createOccPois(map, intercept = 22, formula = ~NULL, sigmaFylke = 0.1,
   sigmaKommune = 0.1, sigmaGrid = 0, sigmaFylkeTrend = 0,
   sigmaKommuneTrend = 0, artypeEff = c(Bebygd = 1, Samferdsel = 1,
-  `Fulldyrka jord` = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog = 1,
-  `Åpen fastmark` = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1, `Ikke
-  kartlagt` = 1), artypeTrend = c(Bebygd = 1, Samferdsel = 1, `Fulldyrka jord`
-  = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog = 1, `Åpen fastmark`
-  = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1, `Ikke kartlagt` = 1),
-  nYears = 5, interceptTrend = 0.95, sdInterceptTrend = 0,
-  sortFylke = T, sortKommune = T, sortGrid = T)
+  `Fulldyrka jord` = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog
+  = 1, `Åpen fastmark` = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1,
+  `Ikke kartlagt` = 1), artypeTrend = c(Bebygd = 1, Samferdsel = 1,
+  `Fulldyrka jord` = 1, `Overflatedyrka jord` = 1, Innmarksbeite = 1, Skog
+  = 1, `Åpen fastmark` = 1, Myr = 1, Isbre = 1, Ferskvann = 1, Hav = 1,
+  `Ikke kartlagt` = 1), nYears = 5, interceptTrend = 0.95,
+  sdInterceptTrend = 0, sortFylke = T, sortKommune = T,
+  sortGrid = T)
 }
 \arguments{
 \item{formula}{Not yet implemented}

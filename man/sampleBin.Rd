@@ -4,9 +4,9 @@
 \alias{sampleBin}
 \title{sampleBin}
 \usage{
-sampleBin(map, nYears = NULL, yearlyCapacity = NULL, resampleTime = 1,
-  resampleWithin = "none", column = "norm", subFylke = NULL,
-  subKommune = NULL, gridCells = NULL, nObs = 1)
+sampleBin(map, nYears = NULL, yearlyCapacity = NULL,
+  resampleTime = 1, resampleWithin = "none", column = "norm",
+  subFylke = NULL, subKommune = NULL, gridCells = NULL, nObs = 1)
 }
 \arguments{
 \item{map}{a surveyHat object (data frame containing ssbids fylke and kommune colums, response colum and potential other grouping columns)}

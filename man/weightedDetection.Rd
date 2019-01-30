@@ -6,8 +6,8 @@
 \usage{
 weightedDetection(occWeights = data.frame(sites = 1:10, weights = c(0.05,
   0.05, 0.05, 0.05, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2)),
-  visWeights = data.frame(sites = 1:10, weights = c(0.05, 0.05, 0.05, 0.05,
-  0.1, 0.1, 0.1, 0.1, 0.2, 0.2)), noOccur = 5, noLocations = 5,
+  visWeights = data.frame(sites = 1:10, weights = c(0.05, 0.05, 0.05,
+  0.05, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2)), noOccur = 5, noLocations = 5,
   noVisits = 5, detectProb = 0.1, nIter = 999)
 }
 \arguments{

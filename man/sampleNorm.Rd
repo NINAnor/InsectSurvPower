@@ -4,9 +4,10 @@
 \alias{sampleNorm}
 \title{sampleNorm}
 \usage{
-sampleNorm(map, nYears = NULL, yearlyCapacity = NULL, resampleTime = 1,
-  resampleWithin = "none", column = "norm", subFylke = NULL,
-  subKommune = NULL, gridCells = NULL, sampleErr = 0)
+sampleNorm(map, nYears = NULL, yearlyCapacity = NULL,
+  resampleTime = 1, resampleWithin = "none", column = "norm",
+  subFylke = NULL, subKommune = NULL, gridCells = NULL,
+  sampleErr = 0)
 }
 \arguments{
 \item{map}{a surveyHat object (data frame containing ssbids fylke and kommune colums, response colum and potential other grouping columns)}
